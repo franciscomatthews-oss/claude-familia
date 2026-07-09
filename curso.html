@@ -23,6 +23,8 @@
     --gold:#F3DBA1;
     --coral:#F0C4B8;
     --line:#E7E2D8;
+    --status-green:#5FA870;
+    --status-red:#D9695E;
     --radius-lg:28px;
     --radius-md:18px;
     --shadow-card: 0 1px 0 rgba(21,20,15,0.04), 0 14px 30px -18px rgba(21,20,15,0.35);
@@ -349,6 +351,54 @@
 
   footer{text-align:center; padding:26px; color:var(--ink-soft); font-size:.78rem;}
 
+  /* ---------------- tareas ---------------- */
+  .new-tile{
+    border:2px dashed var(--line); border-radius:var(--radius-md); padding:26px 16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    color:var(--ink-soft); cursor:pointer; text-align:center; min-height:150px;
+  }
+  .new-tile:hover{border-color:var(--ink); color:var(--ink);}
+  .new-tile .plus{font-size:1.8rem; font-weight:800;}
+  .new-tile-form{display:none; flex-direction:column; gap:8px; width:100%;}
+  .new-tile-form.show{display:flex;}
+  .new-tile-form input{border:1.5px solid var(--line); border-radius:10px; padding:8px 10px; font-size:.85rem; font-family:inherit;}
+  .new-tile-form .row{display:flex; gap:8px;}
+  .new-tile-form button{border:none; background:var(--ink); color:var(--white); border-radius:10px; padding:8px 10px; font-weight:700; font-size:.8rem; cursor:pointer; flex:1;}
+  .new-tile-form .cancel{background:var(--cream); color:var(--ink);}
+
+  .tarea-delete{
+    position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%;
+    border:none; background:rgba(255,255,255,.75); font-size:.78rem; cursor:pointer;
+  }
+  .tarea-delete:hover{background:var(--white);}
+
+  .archivo-item{
+    display:flex; justify-content:space-between; align-items:center; background:var(--white);
+    border-radius:10px; padding:9px 13px; margin-bottom:8px; font-size:.87rem;
+  }
+  .archivo-item img{max-width:60px; max-height:60px; border-radius:8px; display:block; margin-top:6px;}
+
+  .status-strip{
+    display:flex; border-radius:14px; overflow:hidden; box-shadow:var(--shadow-card);
+  }
+  .status-seg{
+    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:4px; padding:16px 6px; color:#fff; font-weight:800; font-size:.76rem; text-align:center;
+    background:var(--status-red); transition:background .2s ease;
+  }
+  .status-seg.si{background:var(--status-green);}
+  .status-seg .check{font-size:1.1rem;}
+  .status-seg .nombre{font-size:.72rem; font-weight:700; opacity:.95;}
+
+  .vote-box{
+    display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap;
+  }
+  .vote-box select{
+    font-family:inherit; font-size:.85rem; padding:9px 12px; border-radius:10px; border:1.5px solid var(--line); background:var(--white);
+  }
+  .vote-yes{border:none; background:var(--status-green); color:#fff; border-radius:10px; padding:9px 16px; font-weight:700; font-size:.85rem; cursor:pointer;}
+  .vote-no{border:none; background:var(--status-red); color:#fff; border-radius:10px; padding:9px 16px; font-weight:700; font-size:.85rem; cursor:pointer;}
+
   /* ---------------- chat ---------------- */
   .chat-wrap{display:flex; flex-direction:column; height:min(640px, 70vh); overflow:hidden;}
   .chat-messages{flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:14px;}
@@ -426,6 +476,7 @@
       <button class="nav-item active" data-view="inicio">Inicio</button>
       <button class="nav-item" data-view="conocimiento">Conocimiento</button>
       <button class="nav-item" data-view="proyecto">Mi Proyecto</button>
+      <button class="nav-item" data-view="tareas">Tareas</button>
       <button class="nav-item" data-view="chat">Chat</button>
     </nav>
     <div class="nav-right">
@@ -482,6 +533,16 @@
       <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box" id="modalBox"></div>
       </div>
+    </section>
+
+    <!-- ============ TAREAS ============ -->
+    <section id="view-tareas" class="view">
+      <div class="section-head">
+        <h2>✅ Tareas</h2>
+        <p>Las tareas de la semana, con archivos adjuntos y quién ya las completó.</p>
+      </div>
+      <div class="square-grid" id="tareasGrid"></div>
+      <div class="proyecto-detail" id="tareaDetail"></div>
     </section>
 
     <!-- ============ CHAT ============ -->
@@ -1504,6 +1565,278 @@ async function deleteModalItem(tipo, id){
   }
   loadModalItems(tipo);
 }
+
+/* ---------------- TAREAS ---------------- */
+const TASK_COLORS = ['p-lime','p-sky','p-lavender','p-teal','p-gold','p-coral'];
+let tareas = [];
+let activeTarea = null;
+let DEMO_TAREAS = [];
+let DEMO_TAREA_ARCHIVOS = {};
+let DEMO_TAREA_VOTOS = {};
+let votanteSeleccionado = PERFILES_FIJOS[0];
+
+async function loadTareas(){
+  if (db){
+    const { data } = await db.from('tareas').select('*').order('created_at', {ascending:false});
+    tareas = data || [];
+  } else {
+    tareas = DEMO_TAREAS;
+  }
+  renderTareasGrid();
+}
+
+function renderTareasGrid(){
+  const grid = document.getElementById('tareasGrid');
+  grid.innerHTML = tareas.map((t,i)=>{
+    const color = t.color || TASK_COLORS[i % TASK_COLORS.length];
+    return `
+      <div class="square-tile ${color}" data-id="${t.id}" style="position:relative;">
+        ${isAdmin ? `<button class="tarea-delete" data-del="${t.id}" title="Eliminar">✕</button>` : ''}
+        <span class="ic">${t.icono || '📋'}</span>
+        <h4>${t.titulo}</h4>
+      </div>`;
+  }).join('') + (isAdmin ? `
+      <div class="new-tile" id="newTareaBtn">
+        <span class="plus">+</span>
+        <span>Nueva tarea</span>
+        <form class="new-tile-form" id="newTareaForm">
+          <input type="text" name="titulo" placeholder="Nombre de la tarea (ej: Tarea 1)" required autocomplete="off">
+          <div class="row">
+            <button type="submit">Crear</button>
+            <button type="button" class="cancel" id="cancelTarea">Cancelar</button>
+          </div>
+        </form>
+      </div>` : '');
+
+  grid.querySelectorAll('.square-tile').forEach(tile=>{
+    tile.addEventListener('click', (e)=>{
+      if (e.target.closest('.tarea-delete')) return;
+      openTarea(tile.dataset.id);
+    });
+  });
+  grid.querySelectorAll('.tarea-delete').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); deleteTarea(btn.dataset.del); });
+  });
+
+  if (isAdmin){
+    const newBtn = document.getElementById('newTareaBtn');
+    const newForm = document.getElementById('newTareaForm');
+    newBtn.addEventListener('click', ()=>{
+      if (newForm.classList.contains('show')) return;
+      newForm.classList.add('show');
+      newBtn.querySelector('.plus').style.display = 'none';
+      newBtn.querySelector('span:not(.plus)').style.display = 'none';
+      newForm.querySelector('input').focus();
+    });
+    document.getElementById('cancelTarea').addEventListener('click', (e)=>{ e.stopPropagation(); renderTareasGrid(); });
+    newForm.addEventListener('click', e=> e.stopPropagation());
+    newForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const titulo = e.target.titulo.value.trim();
+      if (!titulo) return;
+      const color = TASK_COLORS[tareas.length % TASK_COLORS.length];
+      if (db){
+        await db.from('tareas').insert({titulo, descripcion:'', icono:'📋', color});
+      } else {
+        DEMO_TAREAS.unshift({id:'demo-'+Date.now(), titulo, descripcion:'', icono:'📋', color});
+      }
+      loadTareas();
+    });
+  }
+}
+
+async function deleteTarea(id){
+  const t = tareas.find(x=>String(x.id)===String(id));
+  if (!t) return;
+  if (!confirm('¿Eliminar "'+t.titulo+'"? Se borrarán también sus archivos y votos.')) return;
+  if (db){
+    await db.from('tareas').delete().eq('id', id);
+  } else {
+    DEMO_TAREAS = DEMO_TAREAS.filter(x=>String(x.id)!==String(id));
+  }
+  loadTareas();
+}
+
+async function openTarea(id){
+  activeTarea = tareas.find(t=>String(t.id)===String(id));
+  if (!activeTarea) return;
+  document.getElementById('tareasGrid').style.display = 'none';
+  document.querySelector('#view-tareas .section-head').style.display = 'none';
+  const detail = document.getElementById('tareaDetail');
+  detail.classList.add('active');
+  await renderTareaDetail(false);
+  detail.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function closeTareaDetail(){
+  document.getElementById('tareasGrid').style.display = '';
+  document.querySelector('#view-tareas .section-head').style.display = '';
+  document.getElementById('tareaDetail').classList.remove('active');
+  activeTarea = null;
+}
+
+async function renderTareaDetail(editing){
+  const t = activeTarea;
+  const detail = document.getElementById('tareaDetail');
+
+  detail.innerHTML = `
+    <button class="know-back" id="tareaBackBtn">← Volver a Tareas</button>
+    <div class="know-hero ${t.color || 'p-lime'}">
+      ${isAdmin ? `<button class="know-edit-btn" id="tareaEditBtn">${editing ? 'Cancelar' : '✎ Editar'}</button>` : ''}
+      <span class="ic-big">${t.icono || '📋'}</span>
+      <h2>${t.titulo}</h2>
+    </div>
+    ${editing ? `
+      <div class="know-edit-fields show">
+        <div><label>Título</label><input type="text" id="editTareaTitulo" value="${t.titulo}"></div>
+        <div><label>Descripción de la tarea</label>
+          <textarea id="editTareaDesc" style="min-height:180px;">${t.descripcion || ''}</textarea>
+        </div>
+        <div class="know-save-row"><button class="small-btn" id="tareaSaveBtn">Guardar cambios</button></div>
+      </div>
+    ` : `<div class="know-body"><p style="white-space:pre-wrap;">${t.descripcion ? t.descripcion : '<span class="empty-note">Sin descripción todavía.</span>'}</p></div>`}
+
+    <div class="subblock">
+      <h4>📎 Archivos adjuntos</h4>
+      ${isAdmin ? `
+        <div class="dropzone" id="tareaDropzone">
+          📎 Arrastra fotos o archivos aquí, o haz click para elegirlos
+          <input type="file" id="tareaFileInput" multiple>
+        </div>` : ''}
+      <div id="tareaArchivosList" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="subblock">
+      <h4>✅ ¿Quién completó la tarea?</h4>
+      <div class="status-strip" id="statusStrip"></div>
+      <div class="vote-box">
+        <select id="votanteSelect">
+          ${PERFILES_FIJOS.map(n=>`<option value="${n}" ${n===votanteSeleccionado?'selected':''}>${n}</option>`).join('')}
+        </select>
+        <button class="vote-yes" id="voteYesBtn">✅ Sí, la hice</button>
+        <button class="vote-no" id="voteNoBtn">❌ Todavía no</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('tareaBackBtn').addEventListener('click', closeTareaDetail);
+  if (isAdmin){
+    document.getElementById('tareaEditBtn').addEventListener('click', ()=> renderTareaDetail(!editing));
+    if (editing){
+      document.getElementById('tareaSaveBtn').addEventListener('click', saveTarea);
+    } else {
+      setupTareaDropzone();
+    }
+  }
+  document.getElementById('votanteSelect').addEventListener('change', (e)=>{ votanteSeleccionado = e.target.value; });
+  document.getElementById('voteYesBtn').addEventListener('click', ()=> votar(true));
+  document.getElementById('voteNoBtn').addEventListener('click', ()=> votar(false));
+
+  await loadTareaArchivos();
+  await loadVotos();
+}
+
+async function saveTarea(){
+  const t = activeTarea;
+  t.titulo = document.getElementById('editTareaTitulo').value.trim() || t.titulo;
+  t.descripcion = document.getElementById('editTareaDesc').value;
+  if (db){
+    await db.from('tareas').update({titulo:t.titulo, descripcion:t.descripcion}).eq('id', t.id);
+  }
+  tareas = tareas.map(x => String(x.id)===String(t.id) ? t : x);
+  renderTareasGrid();
+  renderTareaDetail(false);
+}
+
+function setupTareaDropzone(){
+  const zone = document.getElementById('tareaDropzone');
+  const input = document.getElementById('tareaFileInput');
+  zone.addEventListener('click', ()=> input.click());
+  input.addEventListener('change', ()=> handleTareaFiles(input.files));
+  ['dragenter','dragover'].forEach(evt => zone.addEventListener(evt, e=>{ e.preventDefault(); zone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e=>{ e.preventDefault(); zone.classList.remove('drag'); }));
+  zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('drag'); if (e.dataTransfer.files.length) handleTareaFiles(e.dataTransfer.files); });
+}
+
+async function handleTareaFiles(fileList){
+  const files = Array.from(fileList);
+  for (const file of files){
+    if (db){
+      const path = `tareas/${activeTarea.id}/${Date.now()}-${file.name}`;
+      await db.storage.from(STORAGE_BUCKET).upload(path, file, {upsert:true}).catch(()=>{});
+      const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      await db.from('tareas_archivos').insert({tarea_id:activeTarea.id, nombre_archivo:file.name, url: pub ? pub.publicUrl : null, es_imagen: file.type.startsWith('image/')});
+    } else {
+      DEMO_TAREA_ARCHIVOS[activeTarea.id] = DEMO_TAREA_ARCHIVOS[activeTarea.id] || [];
+      DEMO_TAREA_ARCHIVOS[activeTarea.id].push({id:'demo-'+Date.now()+Math.random(), nombre_archivo:file.name, url:URL.createObjectURL(file), es_imagen:file.type.startsWith('image/')});
+    }
+  }
+  loadTareaArchivos();
+}
+
+async function loadTareaArchivos(){
+  let items = [];
+  if (db){
+    const { data } = await db.from('tareas_archivos').select('*').eq('tarea_id', activeTarea.id).order('created_at', {ascending:false});
+    items = data || [];
+  } else {
+    items = DEMO_TAREA_ARCHIVOS[activeTarea.id] || [];
+  }
+  const el = document.getElementById('tareaArchivosList');
+  el.innerHTML = items.length ? items.map(a=>`
+    <div class="archivo-item">
+      <div>
+        📎 <a href="${a.url}" target="_blank">${a.nombre_archivo}</a>
+        ${a.es_imagen && a.url ? `<img src="${a.url}" alt="">` : ''}
+      </div>
+      ${isAdmin ? `<button class="comment-delete" data-id="${a.id}" title="Eliminar">✕</button>` : ''}
+    </div>`).join('') : '<p class="empty-note">Sin archivos todavía.</p>';
+  if (isAdmin){
+    el.querySelectorAll('.comment-delete').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if (db){ await db.from('tareas_archivos').delete().eq('id', btn.dataset.id); }
+        else { DEMO_TAREA_ARCHIVOS[activeTarea.id] = (DEMO_TAREA_ARCHIVOS[activeTarea.id]||[]).filter(a=>String(a.id)!==String(btn.dataset.id)); }
+        loadTareaArchivos();
+      });
+    });
+  }
+}
+
+async function loadVotos(){
+  let votos = [];
+  if (db){
+    const { data } = await db.from('tareas_votos').select('*').eq('tarea_id', activeTarea.id);
+    votos = data || [];
+  } else {
+    votos = DEMO_TAREA_VOTOS[activeTarea.id] || [];
+  }
+  const strip = document.getElementById('statusStrip');
+  strip.innerHTML = PERFILES_FIJOS.map(nombre=>{
+    const voto = votos.find(v=>v.perfil_nombre === nombre);
+    const si = voto && voto.completado;
+    return `<div class="status-seg ${si?'si':''}"><span class="check">${si?'✓':'✕'}</span><span class="nombre">${nombre}</span></div>`;
+  }).join('');
+}
+
+async function votar(completado){
+  const perfil_nombre = votanteSeleccionado;
+  if (db){
+    const { data: existing } = await db.from('tareas_votos').select('id').eq('tarea_id', activeTarea.id).eq('perfil_nombre', perfil_nombre);
+    if (existing && existing.length){
+      await db.from('tareas_votos').update({completado}).eq('id', existing[0].id);
+    } else {
+      await db.from('tareas_votos').insert({tarea_id:activeTarea.id, perfil_nombre, completado});
+    }
+  } else {
+    DEMO_TAREA_VOTOS[activeTarea.id] = DEMO_TAREA_VOTOS[activeTarea.id] || [];
+    const list = DEMO_TAREA_VOTOS[activeTarea.id];
+    const idx = list.findIndex(v=>v.perfil_nombre===perfil_nombre);
+    if (idx>-1) list[idx].completado = completado; else list.push({perfil_nombre, completado});
+  }
+  loadVotos();
+}
+
+loadTareas();
 
 /* ---------------- CHAT ---------------- */
 let chatAutor = '';
