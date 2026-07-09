@@ -44,7 +44,35 @@
     border-radius:36px;
     box-shadow: 0 40px 80px -40px rgba(21,20,15,0.35);
     overflow:hidden;
+    display:none;
   }
+  .app-shell.visible{display:block;}
+
+  /* ---------------- login ---------------- */
+  .login-screen{
+    min-height:80vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .login-card{
+    width:100%; max-width:380px; background:var(--white); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-card); padding:36px 32px;
+  }
+  .login-card .logo{margin-bottom:18px;}
+  .login-card h2{font-size:1.4rem; font-weight:800; margin:0 0 6px;}
+  .login-card p{color:var(--ink-soft); font-size:.9rem; margin:0 0 22px; line-height:1.5;}
+  .login-field{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+  .login-field label{font-size:.78rem; font-weight:700; color:var(--ink-soft);}
+  .login-field input{
+    border:1.5px solid var(--line); border-radius:10px; padding:11px 13px; font-size:.9rem; font-family:inherit;
+  }
+  .login-submit{
+    width:100%; border:none; background:var(--ink); color:var(--white); border-radius:10px;
+    padding:12px; font-weight:700; font-size:.92rem; cursor:pointer; margin-top:6px;
+  }
+  .login-error{
+    display:none; background:var(--coral); border-radius:10px; padding:10px 12px; font-size:.83rem; margin-bottom:14px;
+  }
+  .login-error.show{display:block;}
+  .login-note{margin-top:16px; font-size:.78rem; color:var(--ink-soft); line-height:1.5;}
 
   /* ---------------- top nav ---------------- */
   .topnav{
@@ -291,7 +319,29 @@
 </style>
 </head>
 <body>
-<div class="app-shell">
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="logo">✺</div>
+    <h2>Curso Familiar</h2>
+    <p>Ingresa con el correo y la clave que te compartieron.</p>
+    <div class="login-error" id="loginError">Correo o clave incorrectos. Intenta de nuevo.</div>
+    <form id="loginForm">
+      <div class="login-field">
+        <label>Correo</label>
+        <input type="email" name="email" required autocomplete="username">
+      </div>
+      <div class="login-field">
+        <label>Clave</label>
+        <input type="password" name="password" required autocomplete="current-password">
+      </div>
+      <button class="login-submit" type="submit">Entrar</button>
+    </form>
+    <p class="login-note" id="loginNote">Si no tienes cuenta, pídele a quien administra el curso que te la cree.</p>
+  </div>
+</div>
+
+<div class="app-shell" id="appShell">
 
   <header class="topnav">
     <div class="logo">✺</div>
@@ -302,7 +352,7 @@
     </nav>
     <div class="nav-right">
       <button class="cta-pill" data-goto="proyecto">Mi Proyecto <span>→</span></button>
-      <button class="icon-circle" title="Ayuda">?</button>
+      <button class="icon-circle" id="logoutBtn" title="Cerrar sesión">⏻</button>
     </div>
   </header>
 
@@ -361,8 +411,8 @@
    CONFIG — reemplaza esto con los datos de TU proyecto Supabase
    (Settings → API, dentro de tu proyecto en supabase.com)
    ===================================================== */
-const SUPABASE_URL = "TU_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "TU_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://arkvoulmeyfqyssgehrt.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFya3ZvdWxtZXlmcXlzc2dlaHJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NTg2NzMsImV4cCI6MjA5OTEzNDY3M30.2HdJYJ_gpD26YxZNFzwv8puArPcbwVLISO0ez3qfGvY";
 const STORAGE_BUCKET = "curso-familia";
 
 let db = null;
@@ -372,6 +422,65 @@ if (isConfigured && window.supabase) {
 }
 
 document.getElementById('yearNow').textContent = new Date().getFullYear();
+
+/* ---------------- login / autenticación ---------------- */
+let appInited = false;
+
+function showApp(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').classList.add('visible');
+  if (!appInited){
+    appInited = true;
+    initApp();
+  }
+}
+function showLogin(){
+  document.getElementById('appShell').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+async function checkAuth(){
+  if (!db){
+    // modo demo sin Supabase conectado: no hay login que exigir
+    document.getElementById('loginNote').textContent = 'Sitio en modo demo (sin Supabase conectado) — entrando directo, sin pedir clave.';
+    showApp();
+    return;
+  }
+  const { data:{ session } } = await db.auth.getSession();
+  if (session) showApp(); else showLogin();
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const form = e.target;
+  const email = form.email.value.trim();
+  const password = form.password.value;
+  const errBox = document.getElementById('loginError');
+  errBox.classList.remove('show');
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  if (error){
+    errBox.classList.add('show');
+    return;
+  }
+  form.reset();
+  showApp();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  if (db) await db.auth.signOut();
+  showLogin();
+});
+
+if (db){
+  db.auth.onAuthStateChange((_event, session) => {
+    if (session) showApp(); else showLogin();
+  });
+}
+
+checkAuth();
+
+/* ---------------- todo lo demás arranca recién tras el login ---------------- */
+function initApp(){
 
 /* ---------------- navegación entre vistas ---------------- */
 function goto(view){
@@ -828,6 +937,8 @@ async function onAddTip(e){
 }
 
 loadPerfiles();
+
+} // fin de initApp()
 </script>
 </body>
 </html>
