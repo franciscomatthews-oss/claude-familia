@@ -194,6 +194,11 @@
   .know-card h3{margin:14px 0 6px; font-size:1.12rem; font-weight:800; line-height:1.2;}
   .know-card p{margin:0; font-size:.85rem; opacity:.78; line-height:1.4;}
   .know-card .go{font-size:.78rem; font-weight:700; margin-top:14px; opacity:.7;}
+  .p-lime{background:var(--lime);}
+  .p-sky{background:var(--sky);}
+  .p-lavender{background:var(--lavender);}
+  .p-teal{background:var(--teal);}
+  .p-gold{background:var(--gold);}
   .p-coral{background:var(--coral);}
 
   .know-detail{display:none;}
@@ -261,40 +266,49 @@
   .perfil-card.p-lavender{background:var(--lavender);}
   .perfil-card.p-teal{background:var(--teal);}
   .perfil-card.p-gold{background:var(--gold);}
-  .delete-x{
-    position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%;
-    border:none; background:rgba(255,255,255,.7); font-size:.8rem; cursor:pointer; line-height:1;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .delete-x:hover{background:var(--white);}
   .perfil-nombre{font-weight:800; font-size:1.1rem; text-transform:uppercase; margin:6px 0 10px; letter-spacing:.01em;}
   .estado-badge{
     display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.65);
     font-size:.74rem; font-weight:700; padding:5px 10px; border-radius:99px;
   }
-  .add-card{
-    border:2px dashed var(--line); border-radius:var(--radius-md); padding:22px 18px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
-    color:var(--ink-soft); cursor:pointer; text-align:center; min-height:132px;
-  }
-  .add-card:hover{border-color:var(--ink); color:var(--ink);}
-  .add-card .plus{font-size:1.8rem; font-weight:800;}
-  .add-form{display:none; flex-direction:column; gap:8px; width:100%;}
-  .add-form.show{display:flex;}
-  .add-form input{
-    border:1.5px solid var(--line); border-radius:10px; padding:9px 10px; font-size:.85rem; font-family:inherit;
-  }
-  .add-form .row{display:flex; gap:8px;}
-  .add-form button{
-    border:none; background:var(--ink); color:var(--white); border-radius:10px; padding:9px 12px;
-    font-weight:700; font-size:.82rem; cursor:pointer; flex:1;
-  }
-  .add-form .cancel{background:var(--cream); color:var(--ink);}
 
-  /* detail panel */
-  .detail-panel{margin-top:26px; padding:26px 26px 30px; background:var(--cream); border-radius:var(--radius-lg); display:none;}
-  .detail-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:20px;}
-  .detail-head h2{margin:0 0 8px; text-transform:uppercase; font-size:1.5rem;}
+  /* vista de proyecto (página propia) */
+  .proyecto-detail{display:none;}
+  .proyecto-detail.active{display:block; animation:fadeUp .4s ease both;}
+  .proyecto-header{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
+  .stats-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); gap:14px; margin-bottom:22px;}
+  .stat-card{background:var(--cream); border-radius:14px; padding:16px 18px;}
+  .stat-card .num{font-size:1.7rem; font-weight:800;}
+  .stat-card .label{font-size:.72rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin-top:2px;}
+  .progress-bar-wrap{margin-bottom:28px;}
+  .progress-track{display:flex; gap:3px; height:12px; border-radius:99px; overflow:hidden;}
+  .progress-seg{height:100%; border-radius:3px;}
+  .progress-labels{display:flex; justify-content:space-between; margin-top:8px; font-size:.72rem; color:var(--ink-soft); flex-wrap:wrap; gap:6px;}
+  .square-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:16px; margin-bottom:30px;}
+  .square-tile{
+    border-radius:var(--radius-md); padding:26px 16px; text-align:center; cursor:pointer;
+    box-shadow:var(--shadow-card); transition:transform .15s ease;
+  }
+  .square-tile:hover{transform:translateY(-3px);}
+  .square-tile .ic{font-size:2rem; margin-bottom:10px; display:block;}
+  .square-tile h4{margin:0; font-size:.96rem; font-weight:800;}
+
+  /* modal popup */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(21,20,15,.55); z-index:200;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--white); border-radius:var(--radius-lg); max-width:520px; width:100%;
+    max-height:82vh; overflow-y:auto; padding:30px 26px; position:relative;
+  }
+  .modal-close{
+    position:absolute; top:16px; right:16px; border:none; background:var(--cream);
+    width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:.9rem;
+  }
+  .modal-box h3{margin:0 0 16px; font-size:1.2rem; font-weight:800;}
+
   .estado-select{
     font-family:inherit; font-size:.85rem; padding:8px 12px; border-radius:10px; border:1.5px solid var(--line); background:var(--white);
   }
@@ -463,7 +477,11 @@
 
       <div class="perfiles-grid" id="perfilesGrid"></div>
 
-      <div class="detail-panel" id="detailPanel"></div>
+      <div class="proyecto-detail" id="proyectoDetail"></div>
+
+      <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox"></div>
+      </div>
     </section>
 
     <!-- ============ CHAT ============ -->
@@ -944,24 +962,31 @@ const ESTADOS = {
   publicado:{label:'Publicado', emoji:'🔵'},
   pausado:{label:'Pausado', emoji:'⏸'}
 };
-const CARD_COLORS = ['p-lime','p-sky','p-lavender','p-teal','p-gold'];
+const ESTADOS_ORDEN = ['idea','escribiendo','desarrollo','publicado'];
+const CARD_COLORS = ['p-lime','p-sky','p-lavender','p-teal','p-gold','p-coral'];
+const PERFILES_FIJOS = ['Papá','Mamá','Florencia','Elisa','Pedro','Nico','Clemente','Jesús'];
 
 let DEMO = {
-  perfiles:[
-    {id:'demo-1', nombre:'Francisco', estado:'idea', link_publicado:'', idea:''},
-    {id:'demo-2', nombre:'Amelia', estado:'idea', link_publicado:'', idea:''},
-    {id:'demo-3', nombre:'Samir', estado:'idea', link_publicado:'', idea:''}
-  ],
-  mdPorPerfil:{}, comentarios:{}, tips:{}, pdfs:{}, dudas:{}, links:{}
+  perfiles: PERFILES_FIJOS.map((nombre,i) => ({id:'demo-'+i, nombre, estado:'idea', link_publicado:'', idea:''})),
+  mdPorPerfil:{}, pdfs:{}, preguntas:{}, referentes:{}, repositorios:{}, chatPrivado:{}
 };
 
 let perfiles = [];
 let activePerfil = null;
+let miProyectoAutor = '';
 
 async function loadPerfiles(){
   if (db){
-    const {data, error} = await db.from('perfiles').select('*').order('created_at');
-    perfiles = error ? [] : data;
+    let { data } = await db.from('perfiles').select('*');
+    data = data || [];
+    const existentes = data.map(p => p.nombre);
+    const faltantes = PERFILES_FIJOS.filter(n => !existentes.includes(n));
+    if (faltantes.length){
+      await db.from('perfiles').insert(faltantes.map(nombre => ({nombre, estado:'idea'})));
+      const r = await db.from('perfiles').select('*');
+      data = r.data || [];
+    }
+    perfiles = PERFILES_FIJOS.map(n => data.find(p => p.nombre === n)).filter(Boolean);
   } else {
     document.getElementById('demoBanner').style.display = 'block';
     perfiles = DEMO.perfiles;
@@ -976,186 +1001,153 @@ function renderPerfiles(){
     const color = CARD_COLORS[i % CARD_COLORS.length];
     return `
       <div class="perfil-card ${color}" data-id="${p.id}">
-        <button class="delete-x" data-del="${p.id}" title="Eliminar">✕</button>
         <div class="perfil-nombre">${p.nombre}</div>
         <span class="estado-badge">${e.emoji} ${e.label}</span>
       </div>`;
-  }).join('') + `
-      <div class="add-card" id="addCardBtn">
-        <span class="plus">+</span>
-        <span>Agregar integrante</span>
-        <form class="add-form" id="addForm">
-          <input type="text" name="nombre" placeholder="Nombre" required autocomplete="off">
-          <div class="row">
-            <button type="submit">Crear</button>
-            <button type="button" class="cancel" id="cancelAdd">Cancelar</button>
-          </div>
-        </form>
-      </div>`;
+  }).join('');
 
   grid.querySelectorAll('.perfil-card').forEach(card=>{
-    card.addEventListener('click', (e)=>{
-      if (e.target.closest('.delete-x')) return;
-      openPerfil(card.dataset.id);
-    });
-  });
-  grid.querySelectorAll('.delete-x').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{ e.stopPropagation(); deletePerfil(btn.dataset.del); });
-  });
-
-  const addCard = document.getElementById('addCardBtn');
-  const addForm = document.getElementById('addForm');
-  addCard.addEventListener('click', (e)=>{
-    if (addForm.classList.contains('show')) return;
-    addForm.classList.add('show');
-    addCard.querySelector('.plus').style.display='none';
-    addCard.querySelector('span:not(.plus)').style.display='none';
-    addForm.querySelector('input').focus();
-  });
-  document.getElementById('cancelAdd').addEventListener('click', (e)=>{ e.stopPropagation(); renderPerfiles(); });
-  addForm.addEventListener('click', e=> e.stopPropagation());
-  addForm.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const nombre = e.target.nombre.value.trim();
-    if (!nombre) return;
-    if (db){
-      await db.from('perfiles').insert({nombre, estado:'idea'});
-    } else {
-      DEMO.perfiles.push({id:'demo-'+Date.now(), nombre, estado:'idea', link_publicado:''});
-    }
-    loadPerfiles();
+    card.addEventListener('click', ()=> openPerfil(card.dataset.id));
   });
 }
 
-async function deletePerfil(id){
-  const p = perfiles.find(p=>p.id===id);
-  if (!p) return;
-  if (!confirm('¿Eliminar el perfil de ' + p.nombre + '? Se borrarán también su .md, comentarios y tips.')) return;
-  if (db){
-    await db.from('perfiles').delete().eq('id', id);
-  } else {
-    DEMO.perfiles = DEMO.perfiles.filter(x=>x.id!==id);
-  }
-  if (activePerfil && activePerfil.id === id){
-    document.getElementById('detailPanel').style.display = 'none';
-    activePerfil = null;
-  }
-  loadPerfiles();
-}
+/* ---------------- vista de proyecto (página propia, no desplegable) ---------------- */
 
 async function openPerfil(id){
   activePerfil = perfiles.find(p=>p.id===id);
   if (!activePerfil) return;
-  const panel = document.getElementById('detailPanel');
-  panel.style.display = 'block';
 
-  panel.innerHTML = `
-    <button class="back-link" id="backBtn">← Volver a todos los proyectos</button>
-    <div class="detail-head">
+  document.getElementById('perfilesGrid').style.display = 'none';
+  document.querySelector('#view-proyecto .section-head').style.display = 'none';
+  document.getElementById('demoBanner').style.display = 'none';
+
+  const detail = document.getElementById('proyectoDetail');
+  detail.classList.add('active');
+  await renderProyectoDetail();
+  detail.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function closeProyectoDetail(){
+  document.getElementById('perfilesGrid').style.display = '';
+  document.querySelector('#view-proyecto .section-head').style.display = '';
+  if (!db) document.getElementById('demoBanner').style.display = 'block';
+  document.getElementById('proyectoDetail').classList.remove('active');
+  activePerfil = null;
+}
+
+const SQUARES = [
+  {key:'idea', icon:'💡', color:'p-lime', titulo:'Idea'},
+  {key:'preguntas', icon:'❓', color:'p-sky', titulo:'Preguntas'},
+  {key:'referentes', icon:'🔍', color:'p-lavender', titulo:'Referentes'},
+  {key:'repositorios', icon:'💻', color:'p-teal', titulo:'Repositorios'},
+  {key:'chat', icon:'💬', color:'p-coral', titulo:'Chat privado'}
+];
+
+async function renderProyectoDetail(){
+  const detail = document.getElementById('proyectoDetail');
+  const p = activePerfil;
+
+  const [mdVersion, pdfsCount, preguntasCount, ultimaFecha] = await getStats(p.id);
+  const pasoActual = ESTADOS_ORDEN.indexOf(p.estado);
+
+  detail.innerHTML = `
+    <button class="back-link" id="proyectoBackBtn">← Volver a todos los proyectos</button>
+
+    <div class="proyecto-header">
       <div>
-        <h2>${activePerfil.nombre}</h2>
+        <h2 style="text-transform:uppercase; margin:0 0 8px; font-size:1.6rem;">${p.nombre}</h2>
         <select class="estado-select" id="estadoSelect">
-          ${Object.entries(ESTADOS).map(([k,v])=>`<option value="${k}" ${k===activePerfil.estado?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
+          ${Object.entries(ESTADOS).map(([k,v])=>`<option value="${k}" ${k===p.estado?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
         </select>
       </div>
       <div style="text-align:right;">
         <div class="empty-note" style="margin-bottom:4px;">Link publicado</div>
-        <input class="mono" id="linkInput" placeholder="https://..." value="${activePerfil.link_publicado||''}"
+        <input class="mono" id="linkInput" placeholder="https://..." value="${p.link_publicado||''}"
           style="font-size:.82rem; padding:8px 10px; border:1.5px solid var(--line); border-radius:10px; width:220px;">
       </div>
     </div>
 
-    <div class="subblock">
-      <h4>💡 Tu idea</h4>
-      <textarea id="ideaInput" placeholder="Cuenta acá, en un par de frases, qué idea tienes para tu proyecto..."
-        style="width:100%; min-height:90px; font-family:inherit; font-size:.9rem; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--white);">${activePerfil.idea||''}</textarea>
-      <button class="small-btn" id="saveIdeaBtn" style="margin-top:8px;">Guardar idea</button>
+    <div class="stats-row">
+      <div class="stat-card"><div class="num">${mdVersion}</div><div class="label">Versión del .md</div></div>
+      <div class="stat-card"><div class="num">${pdfsCount}</div><div class="label">PDFs subidos</div></div>
+      <div class="stat-card"><div class="num">${preguntasCount}</div><div class="label">Preguntas</div></div>
+      <div class="stat-card"><div class="num">${ultimaFecha}</div><div class="label">Última actividad</div></div>
     </div>
 
-    <div class="grid-2">
-      <div>
-        <div class="subblock">
-          <h4>📄 Tu documento .md</h4>
-          <textarea id="mdEditor" placeholder="Escribe o pega acá tu .md — también puedes subir un archivo abajo."
-            style="width:100%; min-height:200px; font-family:'JetBrains Mono', monospace; font-size:.82rem; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--white);"></textarea>
-          <button class="small-btn" id="saveMdBtn" style="margin-top:8px;">Guardar como nueva versión</button>
-          <div class="dropzone" id="dropzone" style="margin-top:14px;">
-            📎 O arrastra tu archivo <span class="mono">.md</span> aquí, o haz click para elegirlo
-            <input type="file" id="fileInput" accept=".md,text/markdown">
-          </div>
-          <div class="md-render" id="mdRender"><p class="empty-note">Todavía no se ha subido ningún documento de proyecto.</p></div>
-        </div>
-
-        <div class="subblock">
-          <h4>📎 PDFs subidos</h4>
-          <div class="dropzone" id="pdfDropzone">
-            📎 Arrastra un PDF aquí, o haz click para elegirlo
-            <input type="file" id="pdfInput" accept="application/pdf">
-          </div>
-          <div id="pdfList" style="margin-top:10px;"></div>
-        </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-track">
+        ${ESTADOS_ORDEN.map((k,i)=>`<div class="progress-seg ${i<=pasoActual ? 'p-'+ (['coral','gold','sky','lime'][i]) : ''}" style="flex:1; background:${i<=pasoActual ? '' : 'var(--cream)'};"></div>`).join('')}
       </div>
+      <div class="progress-labels">
+        ${ESTADOS_ORDEN.map(k=>`<span>${ESTADOS[k].emoji} ${ESTADOS[k].label}</span>`).join('')}
+      </div>
+    </div>
 
-      <div>
-        <div class="subblock">
-          <h4>💬 Comentarios de la familia</h4>
-          <div id="comentariosList"></div>
-          <form class="comment-form" id="comentarioForm">
-            <input name="autor" placeholder="Tu nombre" required>
-            <input name="texto" placeholder="Escribe un comentario o ánimo..." required>
-            <button class="small-btn" type="submit">Enviar</button>
-          </form>
+    <div class="square-grid">
+      ${SQUARES.map(s=>`
+        <div class="square-tile ${s.color}" data-key="${s.key}">
+          <span class="ic">${s.icon}</span>
+          <h4>${s.titulo}</h4>
+        </div>`).join('')}
+    </div>
+
+    <div class="subblock">
+      <h4>📄 Documentos del proyecto</h4>
+      <textarea id="mdEditor" placeholder="Escribe o pega acá tu .md — también puedes subir un archivo abajo."
+        style="width:100%; min-height:180px; font-family:'JetBrains Mono', monospace; font-size:.82rem; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--white);"></textarea>
+      <button class="small-btn" id="saveMdBtn" style="margin-top:8px;">Guardar como nueva versión</button>
+      <div class="dropzone" id="dropzone" style="margin-top:14px;">
+        📎 O arrastra tu archivo <span class="mono">.md</span> aquí, o haz click para elegirlo
+        <input type="file" id="fileInput" accept=".md,text/markdown">
+      </div>
+      <div class="md-render" id="mdRender"><p class="empty-note">Todavía no se ha subido ningún documento de proyecto.</p></div>
+
+      <div style="margin-top:18px;">
+        <div class="dropzone" id="pdfDropzone">
+          📎 Arrastra un PDF aquí, o haz click para elegirlo
+          <input type="file" id="pdfInput" accept="application/pdf">
         </div>
-        <div class="subblock">
-          <h4>✎ Tips para este proyecto</h4>
-          <div id="tipsList"></div>
-          <form class="tip-form" id="tipForm">
-            <input name="texto" placeholder="Agregar un tip..." required>
-            <button class="small-btn" type="submit">Agregar</button>
-          </form>
-        </div>
-        <div class="subblock">
-          <h4>❓ Dudas de la semana</h4>
-          <div id="dudasList"></div>
-          <form class="comment-form" id="dudaForm">
-            <input name="autor" placeholder="Tu nombre" required>
-            <input name="texto" placeholder="¿Qué duda tienes?" required>
-            <button class="small-btn" type="submit">Enviar</button>
-          </form>
-        </div>
-        <div class="subblock">
-          <h4>🔗 Links interesantes</h4>
-          <div id="linksList"></div>
-          <form class="comment-form" id="linkForm">
-            <input name="titulo" placeholder="Título del link" required>
-            <input name="url" placeholder="https://..." required>
-            <button class="small-btn" type="submit">Agregar</button>
-          </form>
-        </div>
+        <div id="pdfList" style="margin-top:10px;"></div>
       </div>
     </div>
   `;
 
-  document.getElementById('backBtn').addEventListener('click', ()=>{ panel.style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); });
+  document.getElementById('proyectoBackBtn').addEventListener('click', closeProyectoDetail);
   document.getElementById('estadoSelect').addEventListener('change', onEstadoChange);
   document.getElementById('linkInput').addEventListener('change', onLinkChange);
-  document.getElementById('saveIdeaBtn').addEventListener('click', onSaveIdea);
   document.getElementById('saveMdBtn').addEventListener('click', onSaveMdEditor);
+  detail.querySelectorAll('.square-tile').forEach(tile=>{
+    tile.addEventListener('click', ()=> openSquareModal(tile.dataset.key));
+  });
   setupDropzone();
   setupPdfDropzone();
   await loadMd();
   await loadPdfs();
-  await loadComentarios();
-  await loadTips();
-  await loadDudas();
-  await loadLinks();
+}
 
-  document.getElementById('comentarioForm').addEventListener('submit', onAddComentario);
-  document.getElementById('tipForm').addEventListener('submit', onAddTip);
-  document.getElementById('dudaForm').addEventListener('submit', onAddDuda);
-  document.getElementById('linkForm').addEventListener('submit', onAddLink);
-
-  panel.scrollIntoView({behavior:'smooth', block:'start'});
+async function getStats(perfilId){
+  let mdVersion = 0, pdfsCount = 0, preguntasCount = 0;
+  const fechas = [];
+  if (db){
+    const { data: mdRows } = await db.from('proyectos_md').select('version, created_at').eq('perfil_id', perfilId).order('version', {ascending:false}).limit(1);
+    if (mdRows && mdRows.length){ mdVersion = mdRows[0].version; fechas.push(mdRows[0].created_at); }
+    const { data: pdfRows } = await db.from('proyectos_pdf').select('created_at').eq('perfil_id', perfilId);
+    pdfsCount = pdfRows ? pdfRows.length : 0;
+    if (pdfRows) fechas.push(...pdfRows.map(r=>r.created_at));
+    const { data: preguntasRows } = await db.from('dudas').select('created_at').eq('perfil_id', perfilId);
+    preguntasCount = preguntasRows ? preguntasRows.length : 0;
+    if (preguntasRows) fechas.push(...preguntasRows.map(r=>r.created_at));
+  } else {
+    mdVersion = DEMO.mdPorPerfil[perfilId] ? 1 : 0;
+    pdfsCount = (DEMO.pdfs[perfilId]||[]).length;
+    preguntasCount = (DEMO.preguntas[perfilId]||[]).length;
+  }
+  let ultima = '—';
+  if (fechas.length){
+    const masReciente = fechas.sort().reverse()[0];
+    ultima = new Date(masReciente).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit'});
+  }
+  return [mdVersion, pdfsCount, preguntasCount, ultima];
 }
 
 async function onEstadoChange(e){
@@ -1163,17 +1155,11 @@ async function onEstadoChange(e){
   activePerfil.estado = nuevoEstado;
   if (db){ await db.from('perfiles').update({estado:nuevoEstado}).eq('id', activePerfil.id); }
   renderPerfiles();
+  renderProyectoDetail();
 }
 async function onLinkChange(e){
   activePerfil.link_publicado = e.target.value;
   if (db){ await db.from('perfiles').update({link_publicado:e.target.value}).eq('id', activePerfil.id); }
-}
-async function onSaveIdea(){
-  const texto = document.getElementById('ideaInput').value;
-  activePerfil.idea = texto;
-  if (db){ await db.from('perfiles').update({idea:texto}).eq('id', activePerfil.id); }
-  const btn = document.getElementById('saveIdeaBtn');
-  btn.textContent = '¡Guardado!'; setTimeout(()=> btn.textContent='Guardar idea', 1400);
 }
 
 function setupDropzone(){
@@ -1261,102 +1247,195 @@ async function loadPdfs(){
   `).join('') : '<p class="empty-note">Sin PDFs todavía.</p>';
 }
 
-async function loadComentarios(){
-  let items = [];
-  if (db){
-    const { data } = await db.from('comentarios').select('*').eq('perfil_id', activePerfil.id).order('created_at');
-    items = data || [];
-  } else { items = DEMO.comentarios[activePerfil.id] || []; }
-  renderComentarios(items);
+/* ---------------- los 5 cuadrados: popups ---------------- */
+
+function openSquareModal(key){
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('show');
+  if (key === 'idea') renderIdeaModal();
+  if (key === 'preguntas') renderPreguntasModal();
+  if (key === 'referentes') renderReferentesModal();
+  if (key === 'repositorios') renderRepositoriosModal();
+  if (key === 'chat') renderChatPrivadoModal();
 }
-function renderComentarios(items){
-  const el = document.getElementById('comentariosList');
-  el.innerHTML = items.length ? items.map(c=>`
-    <div class="comment">
-      <div><b>${c.autor}</b> — ${c.texto}</div>
-      <button class="comment-delete" data-id="${c.id}" title="Eliminar">✕</button>
-    </div>`).join('') : '<p class="empty-note">Todavía no hay comentarios. ¡Deja el primero!</p>';
-  el.querySelectorAll('.comment-delete').forEach(btn=>{
-    btn.addEventListener('click', ()=> deleteComentario(btn.dataset.id));
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{
+  if (e.target.id === 'modalOverlay') closeModal();
+});
+
+function renderIdeaModal(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <h3>💡 Idea de ${activePerfil.nombre}</h3>
+    <textarea id="modalIdeaInput" placeholder="Cuenta acá, en un par de frases, qué idea tienes para tu proyecto..."
+      style="width:100%; min-height:140px; font-family:inherit; font-size:.9rem; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px;">${activePerfil.idea||''}</textarea>
+    <button class="small-btn" id="modalSaveIdea" style="margin-top:10px;">Guardar</button>
+  `;
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('modalSaveIdea').addEventListener('click', async ()=>{
+    const texto = document.getElementById('modalIdeaInput').value;
+    activePerfil.idea = texto;
+    if (db){ await db.from('perfiles').update({idea:texto}).eq('id', activePerfil.id); }
+    const btn = document.getElementById('modalSaveIdea');
+    btn.textContent = '¡Guardado!'; setTimeout(()=> btn.textContent='Guardar', 1400);
   });
 }
-async function deleteComentario(id){
-  if (db){ await db.from('comentarios').delete().eq('id', id); }
-  else { DEMO.comentarios[activePerfil.id] = (DEMO.comentarios[activePerfil.id]||[]).filter(c=>String(c.id)!==String(id)); }
-  loadComentarios();
+
+function autorFieldHtml(){
+  return `<input type="text" id="modalAutorInput" placeholder="Tu nombre" value="${miProyectoAutor}" style="width:120px; font-size:.85rem; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit;">`;
 }
-async function onAddComentario(e){
+
+function renderPreguntasModal(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <h3>❓ Preguntas de ${activePerfil.nombre}</h3>
+    <div id="modalList"></div>
+    <form id="modalForm" class="comment-form">
+      ${autorFieldHtml()}
+      <input type="text" name="texto" placeholder="¿Qué pregunta tienes?" required>
+      <button class="small-btn" type="submit">Enviar</button>
+    </form>
+  `;
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  loadModalItems('preguntas');
+  document.getElementById('modalForm').addEventListener('submit', (e)=> onAddModalItem(e,'preguntas'));
+}
+
+function renderReferentesModal(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <h3>🔍 Referentes de ${activePerfil.nombre}</h3>
+    <div id="modalList"></div>
+    <form id="modalForm" class="comment-form">
+      <input type="text" name="titulo" placeholder="Título" required>
+      <input type="text" name="url" placeholder="https://..." required>
+      <button class="small-btn" type="submit">Agregar</button>
+    </form>
+  `;
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  loadModalItems('referentes');
+  document.getElementById('modalForm').addEventListener('submit', (e)=> onAddModalLink(e,'referentes','links_interesantes'));
+}
+
+function renderRepositoriosModal(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <h3>💻 Repositorios de ${activePerfil.nombre}</h3>
+    <div id="modalList"></div>
+    <form id="modalForm" class="comment-form">
+      <input type="text" name="titulo" placeholder="Título" required>
+      <input type="text" name="url" placeholder="https://github.com/..." required>
+      <button class="small-btn" type="submit">Agregar</button>
+    </form>
+  `;
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  loadModalItems('repositorios');
+  document.getElementById('modalForm').addEventListener('submit', (e)=> onAddModalLink(e,'repositorios','repositorios'));
+}
+
+function renderChatPrivadoModal(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <h3>💬 Chat privado — ${activePerfil.nombre}</h3>
+    <p class="empty-note" style="margin-top:-10px; margin-bottom:12px;">Solo entre el admin y el dueño de este perfil.</p>
+    <div id="modalList"></div>
+    <form id="modalForm" class="comment-form">
+      ${autorFieldHtml()}
+      <input type="text" name="texto" placeholder="Escribe un mensaje..." required>
+      <button class="small-btn" type="submit">Enviar</button>
+    </form>
+  `;
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  loadModalItems('chat');
+  document.getElementById('modalForm').addEventListener('submit', (e)=> onAddModalItem(e,'chat'));
+}
+
+const MODAL_TABLES = { preguntas:'dudas', referentes:'links_interesantes', repositorios:'repositorios', chat:'chat_privado' };
+
+async function loadModalItems(tipo){
+  let items = [];
+  const tabla = MODAL_TABLES[tipo];
+  if (db){
+    const { data } = await db.from(tabla).select('*').eq('perfil_id', activePerfil.id).order('created_at', {ascending:false});
+    items = data || [];
+  } else {
+    const demoKey = tipo === 'preguntas' ? 'preguntas' : tipo === 'referentes' ? 'referentes' : tipo === 'repositorios' ? 'repositorios' : 'chatPrivado';
+    items = DEMO[demoKey][activePerfil.id] || [];
+  }
+  renderModalList(tipo, items);
+}
+
+function renderModalList(tipo, items){
+  const el = document.getElementById('modalList');
+  if (!items.length){ el.innerHTML = '<p class="empty-note">Nada por acá todavía.</p>'; return; }
+  el.innerHTML = items.map(it=>{
+    let linea = '';
+    if (tipo === 'referentes' || tipo === 'repositorios'){
+      linea = `🔗 <a href="${it.url}" target="_blank">${it.titulo}</a>`;
+    } else {
+      linea = `<b>${it.autor}</b> — ${it.texto}`;
+    }
+    return `<div class="comment"><div>${linea}</div><button class="comment-delete" data-tipo="${tipo}" data-id="${it.id}" title="Eliminar">✕</button></div>`;
+  }).join('');
+  el.querySelectorAll('.comment-delete').forEach(btn=>{
+    btn.addEventListener('click', ()=> deleteModalItem(btn.dataset.tipo, btn.dataset.id));
+  });
+}
+
+async function onAddModalItem(e, tipo){
   e.preventDefault();
   const form = e.target;
-  const autor = form.autor.value.trim();
+  const autorInput = form.querySelector('#modalAutorInput');
+  const autor = autorInput ? autorInput.value.trim() : '';
   const texto = form.texto.value.trim();
   if (!autor || !texto) return;
-  if (db){ await db.from('comentarios').insert({perfil_id:activePerfil.id, autor, texto}); }
-  else { DEMO.comentarios[activePerfil.id] = DEMO.comentarios[activePerfil.id] || []; DEMO.comentarios[activePerfil.id].push({id:'demo-'+Date.now(), autor, texto}); }
-  form.reset(); loadComentarios();
-}
-
-
-async function loadTips(){
-  let items = [];
+  miProyectoAutor = autor;
+  const tabla = MODAL_TABLES[tipo];
   if (db){
-    const { data } = await db.from('tips').select('*').eq('perfil_id', activePerfil.id).order('created_at');
-    items = data || [];
-  } else { items = DEMO.tips[activePerfil.id] || []; }
-  renderTips(items);
-}
-function renderTips(items){
-  const el = document.getElementById('tipsList');
-  el.innerHTML = items.length ? items.map(t=>`<div class="tip-item">${t.texto}</div>`).join('') : '<p class="empty-note">Sin tips todavía.</p>';
-}
-async function onAddTip(e){
-  e.preventDefault();
-  const form = e.target;
-  const texto = form.texto.value.trim();
-  if (!texto) return;
-  if (db){ await db.from('tips').insert({perfil_id:activePerfil.id, texto}); }
-  else { DEMO.tips[activePerfil.id] = DEMO.tips[activePerfil.id] || []; DEMO.tips[activePerfil.id].push({texto}); }
-  form.reset(); loadTips();
+    await db.from(tabla).insert({perfil_id:activePerfil.id, autor, texto});
+  } else {
+    const demoKey = tipo === 'preguntas' ? 'preguntas' : 'chatPrivado';
+    DEMO[demoKey][activePerfil.id] = DEMO[demoKey][activePerfil.id] || [];
+    DEMO[demoKey][activePerfil.id].push({id:'demo-'+Date.now(), autor, texto});
+  }
+  form.texto.value = '';
+  loadModalItems(tipo);
+  renderProyectoDetail();
 }
 
-async function loadDudas(){
-  let items = [];
-  if (db){
-    const { data } = await db.from('dudas').select('*').eq('perfil_id', activePerfil.id).order('created_at', {ascending:false});
-    items = data || [];
-  } else { items = DEMO.dudas[activePerfil.id] || []; }
-  const el = document.getElementById('dudasList');
-  el.innerHTML = items.length ? items.map(d=>`<div class="comment"><b>${d.autor}</b> — ${d.texto}</div>`).join('') : '<p class="empty-note">Sin dudas por ahora.</p>';
-}
-async function onAddDuda(e){
-  e.preventDefault();
-  const form = e.target;
-  const autor = form.autor.value.trim();
-  const texto = form.texto.value.trim();
-  if (!autor || !texto) return;
-  if (db){ await db.from('dudas').insert({perfil_id:activePerfil.id, autor, texto}); }
-  else { DEMO.dudas[activePerfil.id] = DEMO.dudas[activePerfil.id] || []; DEMO.dudas[activePerfil.id].push({autor, texto}); }
-  form.reset(); loadDudas();
-}
-
-async function loadLinks(){
-  let items = [];
-  if (db){
-    const { data } = await db.from('links_interesantes').select('*').eq('perfil_id', activePerfil.id).order('created_at', {ascending:false});
-    items = data || [];
-  } else { items = DEMO.links[activePerfil.id] || []; }
-  const el = document.getElementById('linksList');
-  el.innerHTML = items.length ? items.map(l=>`<div class="comment">🔗 <a href="${l.url}" target="_blank">${l.titulo}</a></div>`).join('') : '<p class="empty-note">Sin links todavía.</p>';
-}
-async function onAddLink(e){
+async function onAddModalLink(e, tipo, tabla){
   e.preventDefault();
   const form = e.target;
   const titulo = form.titulo.value.trim();
   const url = form.url.value.trim();
   if (!titulo || !url) return;
-  if (db){ await db.from('links_interesantes').insert({perfil_id:activePerfil.id, titulo, url}); }
-  else { DEMO.links[activePerfil.id] = DEMO.links[activePerfil.id] || []; DEMO.links[activePerfil.id].push({titulo, url}); }
-  form.reset(); loadLinks();
+  if (db){
+    await db.from(tabla).insert({perfil_id:activePerfil.id, titulo, url});
+  } else {
+    const demoKey = tipo === 'referentes' ? 'referentes' : 'repositorios';
+    DEMO[demoKey][activePerfil.id] = DEMO[demoKey][activePerfil.id] || [];
+    DEMO[demoKey][activePerfil.id].push({id:'demo-'+Date.now(), titulo, url});
+  }
+  form.reset();
+  loadModalItems(tipo);
+}
+
+async function deleteModalItem(tipo, id){
+  const tabla = MODAL_TABLES[tipo];
+  if (db){
+    await db.from(tabla).delete().eq('id', id);
+  } else {
+    const demoKey = tipo === 'preguntas' ? 'preguntas' : tipo === 'referentes' ? 'referentes' : tipo === 'repositorios' ? 'repositorios' : 'chatPrivado';
+    DEMO[demoKey][activePerfil.id] = (DEMO[demoKey][activePerfil.id]||[]).filter(it => String(it.id)!==String(id));
+  }
+  loadModalItems(tipo);
 }
 
 /* ---------------- CHAT ---------------- */
