@@ -664,43 +664,46 @@ const LESSONS_DEFAULT = [
   { id:'que-es-claude', icon:'🤖', color:'p-lime',
     titulo:'¿Qué es Claude?',
     resumen:'No es un buscador: es tu asistente.',
-    contenido:`<p>Claude es un asistente de inteligencia artificial de Anthropic. La diferencia con un buscador es que <b>entiende contexto</b> y conversa: le explicas lo que necesitas, en tus palabras, y te ayuda a redactar, ordenar información, analizar un archivo o crear cosas completas — como este mismo sitio, que se construyó conversando con Claude.</p>
+    contenido:`<p>Claude es un asistente de inteligencia artificial creado por Anthropic. La diferencia con un buscador es que <b>entiende contexto y conversa</b>: le explicas lo que necesitas, en tus palabras, y te ayuda a redactar, ordenar información, analizar un archivo o crear cosas completas — como este mismo sitio, que se construyó conversando con Claude, en varias sesiones, pidiendo cambios de a poco.</p>
+    <p>No es un buscador porque no te devuelve una lista de links: te devuelve el resultado ya pensado y armado. Y no es "una app más" — es más como tener a alguien capaz sentado al lado, al que le puedes pedir ayuda con casi cualquier tarea de escritorio: escribir, ordenar, programar, analizar, planificar.</p>
     <h4>Claude, ChatGPT y Gemini — no son iguales</h4>
     <table><tr><th>Herramienta</th><th>Empresa</th><th>Fortaleza</th><th>Ideal para</th></tr>
-    <tr><td><b>Claude</b></td><td>Anthropic</td><td>Memoria y contexto largo</td><td>Redacción, análisis, documentos, contenido</td></tr>
+    <tr><td><b>Claude</b></td><td>Anthropic</td><td>Memoria y contexto largo, seguimiento fiel de instrucciones</td><td>Redacción, análisis, documentos, proyectos largos</td></tr>
     <tr><td>ChatGPT</td><td>OpenAI</td><td>Uso general, plugins, imagen</td><td>Tareas generales, research, generación de imagen</td></tr>
     <tr><td>Gemini</td><td>Google</td><td>Integración con Google</td><td>Si vives dentro de Workspace / Drive / Docs</td></tr>
     </table>
     <h4>Cuándo usarlo</h4>
     <ul><li>Cuando necesitas pensar en voz alta con alguien y que te ayude a estructurar una idea.</li><li>Cuando tienes un documento, planilla o foto y necesitas que alguien lo revise por ti.</li><li>Cuando quieres construir algo (como este sitio) sin escribir código desde cero.</li></ul>
-    <p class="callout"><b>Ejemplo real:</b> "Tengo estas notas sueltas de la reunión familiar de ayer, ayúdame a ordenarlas en una lista de tareas con quién hace qué." Eso es exactamente el tipo de cosa para la que sirve.</p>`
+    <p class="callout"><b>Ejemplo real:</b> "Tengo estas notas sueltas de la reunión familiar de ayer, ayúdame a ordenarlas en una lista de tareas con quién hace qué." Eso es exactamente el tipo de cosa para la que sirve — no necesitas saber "hablarle en código", solo explicarle como se lo explicarías a una persona.</p>`
   },
   { id:'como-pedirlo', icon:'🎯', color:'p-sky',
     titulo:'Cómo pedírselo bien',
     resumen:'Contexto + Tarea + Formato.',
-    contenido:`<p>No es una pregunta única, es una conversación: escribes lo que necesitas, Claude responde, y tú ajustas — corriges, cambias el tono, pides otra versión. Nadie acierta a la primera, y está bien.</p>
+    contenido:`<p>No es una pregunta única, es una conversación: escribes lo que necesitas, Claude responde, y tú ajustas — corriges, cambias el tono, pides otra versión. Nadie acierta a la primera, y está bien: se trata de ir afinando.</p>
     <h4>La fórmula que siempre funciona</h4>
     <ul>
-      <li><b>Contexto:</b> quién eres, para qué es, qué tono quieres. Mientras más específico, mejor.</li>
-      <li><b>Tarea:</b> qué necesitas exactamente — un verbo claro: redacta, resume, ordena, analiza, compara.</li>
+      <li><b>Contexto:</b> quién eres, para qué es, qué tono quieres. Mientras más específico, mejor — Claude no puede adivinar lo que no le dices.</li>
+      <li><b>Tarea:</b> qué necesitas exactamente — un verbo claro: redacta, resume, ordena, analiza, compara, corrige.</li>
       <li><b>Formato:</b> cómo lo quieres recibir — tabla, lista, documento, resumen de 5 líneas.</li>
     </ul>
-    <h4>Cuándo usar cada nivel de detalle</h4>
-    <ul><li>Para algo simple y rápido: una frase directa alcanza ("resume esto en 3 puntos").</li><li>Para algo que te importa que salga bien a la primera: dale los tres ingredientes completos.</li></ul>
-    <p class="callout"><b>Ejemplo real:</b> "Soy el encargado de organizar el cumpleaños familiar. Arma una lista de tareas pendientes en tabla, con responsable y fecha, tono simple." — mucho mejor que solo "ayúdame con el cumpleaños".</p>
-    <p>Si no sabes bien cómo pedirlo: dile "ayúdame a armar el prompt para esto" — Claude también te ayuda con eso.</p>`
+    <h4>Compara estos dos pedidos</h4>
+    <p class="callout">❌ "Ayúdame con el cumpleaños."<br>✅ "Soy el encargado de organizar el cumpleaños familiar del sábado. Arma una lista de tareas pendientes en tabla, con responsable y fecha, tono simple."</p>
+    <p>El segundo le da a Claude todo lo que necesita para responder bien a la primera. El primero lo obliga a adivinar, y probablemente tengas que corregirlo dos o tres veces.</p>
+    <p>Si no sabes bien cómo pedirlo: dile directamente "ayúdame a armar el prompt para esto" — Claude también te ayuda con eso.</p>`
   },
   { id:'chat-cowork-code', icon:'🧩', color:'p-lavender',
     titulo:'Chat, Cowork y Code: no son lo mismo',
     resumen:'Cada uno sirve para algo distinto.',
-    contenido:`<p>Los tres son formas de usar Claude, pero para necesidades distintas — piensa en ellos como tres herramientas del mismo cajón.</p>
+    contenido:`<p>Los tres son formas de usar Claude, pero pensadas para necesidades distintas.</p>
     <ul>
-      <li><b>Chat:</b> la conversación normal, el punto de partida. Sirve para redactar, resumir, resolver dudas, analizar un archivo. No necesitas saber nada técnico. <i>Ejemplo: pedirle que te ayude a escribir un mensaje difícil.</i></li>
-      <li><b>Cowork:</b> un agente de escritorio que automatiza tareas con varios pasos y archivos — por ejemplo, ordenar una carpeta llena de fotos, revisar 10 documentos y armar un resumen de todos. Sin escribir código. <i>Ejemplo: "revisa estos 20 PDFs de recibos y arma un resumen de gastos".</i></li>
-      <li><b>Code:</b> pensado para programar de verdad — crear y editar archivos de código real, como el sitio que estamos construyendo en este curso. <i>Ejemplo: pedirle que agregue una función nueva a una página web.</i></li>
+      <li><b>Chat:</b> la conversación normal, el punto de partida. Le pides algo, te responde en el momento, tú lees y decides el siguiente paso. Ideal para redactar, resumir, resolver dudas, analizar un archivo puntual.</li>
+      <li><b>Cowork:</b> en vez de responder una pregunta a la vez, le das un <b>objetivo</b> y Claude arma un plan y lo ejecuta por su cuenta — organiza archivos, redacta documentos completos, investiga y sintetiza — mientras tú haces otra cosa. Puedes pedirle una tarea, cerrar el computador, y volver más tarde a encontrarla lista. Funciona conectado a tus herramientas (como Gmail o Drive, si tú se lo permites) y deja el resultado directamente donde lo necesitas, no solo como texto en el chat.</li>
+      <li><b>Code:</b> la versión pensada para programar de verdad — trabaja conectado a un repositorio de código real (como el de este sitio) y puede planificar y ejecutar cambios de forma autónoma. Tiene un "modo plan": antes de tocar nada, te muestra qué va a hacer.</li>
     </ul>
+    <h4>La diferencia en la práctica</h4>
+    <p class="callout">Con <b>Chat</b> le pides un mail: te da el texto, tú lo copias y lo pegas en tu correo.<br>Con <b>Cowork</b> le pides el mismo mail: Claude lo redacta con tu contexto y lo deja armado, directamente en tu bandeja de borradores. Tú solo lo revisas y envías.</p>
     <h4>Cuándo usar cuál</h4>
-    <ul><li>¿Es una pregunta o un texto que necesitas? → Chat.</li><li>¿Son muchos archivos o pasos repetitivos? → Cowork.</li><li>¿Es código, una app, un sitio web? → Code.</li></ul>
+    <ul><li>¿Es una pregunta puntual o un texto que necesitas ahora? → Chat.</li><li>¿Son muchos pasos, archivos, o algo que preferirías delegar del todo? → Cowork.</li><li>¿Es código, una app, un sitio web? → Code.</li></ul>
     <p class="callout">Para este curso, casi todo lo hacemos desde el <b>Chat</b> normal — Cowork y Code son un siguiente nivel, para cuando el proyecto de alguien lo necesite.</p>`
   },
   { id:'buscadores', icon:'🔍', color:'p-teal',
@@ -708,22 +711,22 @@ const LESSONS_DEFAULT = [
     resumen:'Búsqueda web, investigación profunda, búsqueda de imágenes.',
     contenido:`<p>Claude puede "salir a internet" de distintas formas — pero cada una cuesta más caro (en tokens) y no siempre hace falta prenderlas.</p>
     <ul>
-      <li><b>Búsqueda web:</b> úsala solo cuando necesitas información actual de internet — precios de hoy, noticias, algo que puede haber cambiado desde que Claude aprendió. <i>Ejemplo: "¿cuál es el clima en Santiago este fin de semana?"</i>. No la actives para redactar algo que Claude ya sabe de memoria, como explicar un concepto.</li>
-      <li><b>Investigación profunda (deep research):</b> para investigaciones con muchas fuentes, comparaciones a fondo, un informe armado. <i>Ejemplo: "compara 5 alternativas de colegios en la zona, con pros y contras de cada uno."</i> No es para el día a día — es para cuando de verdad necesitas profundidad y estás dispuesto a esperar un poco más la respuesta.</li>
+      <li><b>Búsqueda web:</b> úsala solo cuando necesitas información actual de internet — precios de hoy, noticias, algo que puede haber cambiado desde que Claude aprendió por última vez. <i>Ejemplo: "¿cuál es el clima en Santiago este fin de semana?"</i>. No la actives para redactar algo que Claude ya sabe de memoria, como explicar un concepto general.</li>
+      <li><b>Investigación profunda (deep research):</b> para investigaciones con muchas fuentes, comparaciones a fondo, un informe armado y citado. <i>Ejemplo: "compara 5 alternativas de colegios en la zona, con pros y contras de cada uno."</i> No es para el día a día — es para cuando de verdad necesitas profundidad y estás dispuesto a esperar un poco más la respuesta, porque revisa muchas más fuentes que una búsqueda normal.</li>
       <li><b>Búsqueda de imágenes:</b> cuando quieres ver referencias visuales de algo — cómo se ve un lugar, un objeto, un estilo de decoración.</li>
     </ul>
     <p class="callout">Regla simple: todos estos vienen <b>apagados por defecto</b>. Los prendes solo cuando los necesitas — cada uno que dejas prendido suma costo a cada respuesta, aunque no lo estés usando en ese momento puntual.</p>`
   },
   { id:'artefactos', icon:'📦', color:'p-gold',
     titulo:'Artefactos: entregables listos',
-    resumen:'Documentos, tablas, guiones, PDFs, plantillas.',
-    contenido:`<p>Cuando le pides un documento, una tabla o un formato específico, el resultado aparece separado del chat, en su propia ventana, listo para copiar, editar o descargar — eso es un <b>artefacto</b>. Es distinto a una respuesta normal de chat: queda como un archivo independiente.</p>
+    resumen:'Documentos, tablas, guiones, PDFs, plantillas, hasta apps.',
+    contenido:`<p>Cuando le pides un documento, una tabla o un formato específico, el resultado aparece separado del chat, en su propia ventana — eso es un <b>artefacto</b>. Piénsalo como una pizarra aparte: mientras el chat sigue siendo la conversación, el artefacto es el "producto terminado", listo para copiar, editar o descargar.</p>
     <ul>
       <li><b>Doc Word:</b> briefs, minutas, reportes, cartas.</li>
       <li><b>Excel:</b> planillas, presupuestos, dashboards simples con gráficos.</li>
       <li><b>Guiones:</b> para videos, presentaciones, discursos.</li>
       <li><b>PDF:</b> propuestas, resúmenes para compartir o imprimir.</li>
-      <li><b>Plantillas:</b> formatos reutilizables para el resto de la familia — como el sitio que estás usando ahora mismo.</li>
+      <li><b>Sitios y apps interactivas:</b> como este mismo curso — páginas completas, con botones, formularios, hasta jueguitos simples.</li>
     </ul>
     <h4>Cuándo usarlo</h4>
     <p>Cada vez que el resultado final sea algo que quieras guardar, compartir o editar por tu cuenta después — no algo que solo necesitas leer una vez en el chat.</p>
@@ -732,9 +735,10 @@ const LESSONS_DEFAULT = [
   { id:'proyectos', icon:'🗂️', color:'p-coral',
     titulo:'Proyectos: memoria para cada tema',
     resumen:'Un proyecto por integrante, o por cada idea que estén armando.',
-    contenido:`<p>En un chat normal, Claude no recuerda lo de la conversación anterior una vez que la cierras. Dentro de un <b>Proyecto</b>, sí — puedes cargar ahí los archivos, instrucciones fijas y contexto que no quieres repetir cada vez que le pides algo.</p>
+    contenido:`<p>En un chat normal, Claude no recuerda lo de la conversación anterior una vez que la cierras. Dentro de un <b>Proyecto</b>, sí — es un espacio de trabajo aparte, con su propio historial de chats y su propia "base de conocimiento".</p>
     <h4>Qué cargar en un proyecto</h4>
     <ul><li>Documentos de referencia (como tu <span class="mono">.md</span> de este curso).</li><li>Instrucciones fijas: "siempre respóndeme en tono cercano", "nunca uses jerga técnica".</li><li>Contexto que se repite: quién eres, para qué es el proyecto.</li></ul>
+    <p>Los proyectos están disponibles incluso con cuenta gratuita (hasta 5), y cada uno mantiene su información separada de los demás — así Claude no mezcla el contexto de un proyecto con el de otro.</p>
     <p class="callout"><b>Ejemplo real:</b> un proyecto por integrante de la familia, o uno por cada idea que estén desarrollando en este curso. Ahí cargas tu <span class="mono">.md</span> y tu idea, y cada vez que le pidas algo relacionado, Claude ya sabe todo el contexto — no se lo repites nunca más, ni siquiera en un chat nuevo dentro de ese proyecto.</p>`
   },
   { id:'ecosistema', icon:'🔌', color:'p-lime',
@@ -742,8 +746,8 @@ const LESSONS_DEFAULT = [
     resumen:'Skills, Conectores, MCP, Plugins.',
     contenido:`<p>Más allá del chat, hay piezas adicionales que amplían lo que Claude puede hacer. No las necesitas desde el día uno, pero conviene saber que existen.</p>
     <ul>
-      <li><b>Skill:</b> una instrucción permanente que Claude ejecuta automáticamente cuando detecta que aplica — se configura una vez, funciona para siempre. <i>Ejemplo: una skill que sabe formatear siempre tus documentos igual.</i></li>
-      <li><b>Conector:</b> integración con Gmail, Calendar, Drive u otros servicios — le da acceso a tu información real, con tu permiso. <i>Ejemplo: que revise tu calendario y te arme la semana.</i></li>
+      <li><b>Skill:</b> un procedimiento fijo que le enseñas una vez y Claude repite siempre igual, sin que se lo vuelvas a explicar. <i>Ejemplo: una skill que sabe formatear siempre tus documentos de la misma forma.</i></li>
+      <li><b>Conector:</b> integración con Gmail, Calendar, Drive u otros servicios — le da acceso a tu información real, con tu permiso, y tú decides qué puede tocar y qué no. <i>Ejemplo: que revise tu calendario y te arme la semana.</i></li>
       <li><b>MCP:</b> el protocolo técnico que conecta Claude con sistemas externos — el "cable" detrás de los conectores.</li>
       <li><b>Plugin:</b> un conjunto de skills empaquetado para una tarea específica, como instalar una app chica dentro de Claude.</li>
     </ul>
@@ -751,46 +755,48 @@ const LESSONS_DEFAULT = [
   },
   { id:'modelos', icon:'⚙️', color:'p-sky',
     titulo:'Los modelos: Haiku, Sonnet, Opus',
-    resumen:'De más rápido a más profundo.',
+    resumen:'De más rápido y económico, a más profundo.',
     contenido:`<p>Claude no es "uno solo" — hay distintos modelos, pensados para distinto nivel de esfuerzo. Elegir el correcto es el cambio de mayor impacto para rendir mejor y gastar menos.</p>
     <ul>
-      <li><b>Haiku — rápido:</b> respuestas cortas, ortografía, formato, resúmenes chicos, preguntas simples. <i>Ejemplo: "corrígeme la ortografía de este mensaje".</i></li>
-      <li><b>Sonnet — intermedio:</b> redacción de contenido, análisis, guiones, planificación — el más usado para el día a día. <i>Ejemplo: "ayúdame a redactar el discurso para el cumpleaños de mamá".</i></li>
-      <li><b>Opus — profundo:</b> investigación pesada, lógica compleja, estrategia a fondo, problemas sin solución clara. <i>Ejemplo: "ayúdame a pensar la estrategia financiera para los próximos 5 años".</i></li>
+      <li><b>Haiku — rápido y económico:</b> respuestas cortas, ortografía, formato, resúmenes chicos, preguntas simples. <i>Ejemplo: "corrígeme la ortografía de este mensaje".</i></li>
+      <li><b>Sonnet — el equilibrado:</b> el modelo por defecto para la mayoría de las tareas del día a día: redacción, análisis, guiones, planificación. Si no eliges nada, probablemente ya estés usando este.</li>
+      <li><b>Opus — el más profundo:</b> investigación pesada, lógica compleja, tareas largas de varios pasos, problemas sin solución clara. <i>Ejemplo: "ayúdame a pensar la estrategia financiera para los próximos 5 años".</i></li>
     </ul>
-    <p class="callout">Usar Haiku para lo simple libera presupuesto para cuando de verdad necesitas Sonnet u Opus. No siempre hace falta el modelo más potente.</p>`
+    <p class="callout">Usar el modelo justo para cada tarea (no siempre el más potente) es lo que más ayuda a rendir mejor. Los nombres y versiones exactas van cambiando con el tiempo — la lógica de "rápido / equilibrado / profundo" se mantiene igual.</p>`
   },
   { id:'ahorrar-tokens', icon:'🪙', color:'p-lavender',
     titulo:'Cómo no quemarte los tokens',
     resumen:'5 tips para rendir más con menos.',
-    contenido:`<p>Claude no cuenta mensajes — cuenta <b>tokens</b> (la unidad con la que mide el texto). Algunas conversaciones queman hasta 10 veces más tokens que otras.</p>
+    contenido:`<p>Claude no cuenta mensajes — cuenta <b>tokens</b> (la unidad con la que mide el texto). Algunas conversaciones queman muchos más tokens que otras, sobre todo cuando se alargan.</p>
     <ul>
-      <li><b>1. Edita el prompt, no mandes un follow-up.</b> Si la respuesta no sirvió, usa "editar" sobre tu mensaje original en vez de mandar otro corrigiendo — así la respuesta vieja se reemplaza en vez de sumarse. Editar en vez de encadenar mensajes corta el uso de tokens entre 80–90% en una conversación larga.</li>
-      <li><b>2. Chat nuevo cada 15–20 mensajes.</b> Tu primer mensaje cuesta poco; para el mensaje 30, la misma pregunta simple cuesta muchísimo más, porque arrastra todo el historial. Pídele un resumen, abre un chat nuevo, pega el resumen y sigue ahí.</li>
-      <li><b>3. Usa el modelo correcto para la tarea.</b> Haiku para lo simple, Sonnet para lo normal, Opus solo para lo realmente complejo.</li>
-      <li><b>4. Configura Memory / Preferencias una vez.</b> Así no repites tu contexto (quién eres, tu tono, tu proyecto) en cada chat nuevo.</li>
+      <li><b>1. Edita el prompt, no mandes un follow-up.</b> Si la respuesta no sirvió, usa "editar" sobre tu mensaje original en vez de mandar otro corrigiendo — así la respuesta vieja se reemplaza en vez de sumarse al historial. Editar en vez de encadenar mensajes reduce muchísimo el uso de tokens en una conversación larga.</li>
+      <li><b>2. Chat nuevo cada 15–20 mensajes.</b> Tu primer mensaje cuesta poco; a medida que la conversación crece, la misma pregunta simple cuesta cada vez más, porque arrastra todo el historial anterior. Pídele un resumen, abre un chat nuevo, pega el resumen y sigue ahí.</li>
+      <li><b>3. Usa el modelo correcto para la tarea.</b> Rápido para lo simple, el modelo equilibrado para lo normal, el más profundo solo para lo realmente complejo.</li>
+      <li><b>4. Configura tu Memoria una vez.</b> Así no repites tu contexto (quién eres, tu tono, tu proyecto) en cada chat nuevo — ver la lección de Memoria y Preferencias.</li>
       <li><b>5. Apaga lo que no estás usando.</b> Búsqueda web, investigación profunda, pensamiento extendido — cada uno prendido suma costo a todas tus respuestas, aunque no lo uses en ese chat puntual.</li>
     </ul>`
   },
   { id:'memoria-preferencias', icon:'🧠', color:'p-gold',
-    titulo:'Memory y Preferencias: configúralo una vez',
+    titulo:'Memoria y Preferencias: configúralo una vez',
     resumen:'Para no repetir quién eres en cada chat nuevo.',
-    contenido:`<p>Cada chat nuevo que empiezas sin contexto te obliga a re-explicar cosas básicas: quién eres, en qué proyecto estás, qué tono prefieres. Eso cuesta tiempo y tokens, sin necesidad.</p>
-    <h4>La solución</h4>
-    <p>En Configuración → Memory / Preferencias, puedes cargar una vez datos como tu rol, tu tono habitual, o el contexto de tu proyecto — y Claude lo va a tener presente en cada conversación nueva, sin que lo repitas.</p>
-    <p class="callout"><b>Ejemplo real:</b> si cargas "estoy armando un proyecto de seguimiento de gastos familiares, prefiero explicaciones simples, sin jerga técnica" — cada chat nuevo va a arrancar ya sabiendo eso.</p>`
+    contenido:`<p>Claude puede recordar automáticamente cosas de tus conversaciones anteriores — quién eres, en qué proyecto estás, qué tono prefieres — para no obligarte a re-explicarlo cada vez que abres un chat nuevo.</p>
+    <h4>Cómo funciona</h4>
+    <p>En Configuración → Memoria, puedes ver exactamente qué está recordando Claude sobre ti, y <b>editarlo o borrarlo</b> cuando quieras — no es una caja negra. También puedes crear espacios de memoria separados, por ejemplo uno para cada proyecto, así el contexto de uno no se mezcla con el de otro.</p>
+    <p class="callout"><b>Ejemplo real:</b> si Claude recuerda "estoy armando un proyecto de seguimiento de gastos familiares, prefiero explicaciones simples, sin jerga técnica" — cada chat nuevo va a arrancar ya sabiendo eso, sin que lo repitas.</p>
+    <p>Si en algún momento cambias de tema o el contexto ya no aplica, puedes simplemente decirle "olvida eso" — el control siempre es tuyo.</p>`
   },
   { id:'privacidad', icon:'🔒', color:'p-lavender',
     titulo:'Privacidad: qué compartir y qué no',
     resumen:'La respuesta corta: con criterio.',
-    contenido:`<p>Claude es de Anthropic, una empresa enfocada en IA segura. En la versión de pago, tus conversaciones no se usan para entrenar el modelo — lo que escribes no queda disponible para otras personas.</p>
-    <h4>Aun así, ten criterio</h4>
+    contenido:`<p>Anthropic, la empresa detrás de Claude, se dedica específicamente a construir IA de forma segura y responsable. Aun así, como con cualquier herramienta digital, conviene tener criterio sobre qué le compartes.</p>
+    <h4>Buenas prácticas simples</h4>
     <ul>
-      <li>No es un gestor documental — no reemplaza tener tus contraseñas, claves o datos bancarios guardados ahí.</li>
+      <li>No es un gestor de contraseñas — no guardes ahí claves, números de tarjeta o datos bancarios.</li>
       <li>Evita compartir datos sensibles de otras personas sin su permiso (por ejemplo, información médica de un familiar).</li>
+      <li>Si le das acceso a herramientas como tu correo o Drive (a través de Cowork o conectores), revisa qué le estás permitiendo tocar — tú decides el alcance, y las acciones importantes piden tu aprobación antes de ejecutarse.</li>
       <li>El criterio es tuyo: Claude procesa lo que tú decides darle, ni más ni menos.</li>
     </ul>
-    <p class="callout"><b>Configuración recomendada:</b> en tu perfil de Claude, revisa la opción de privacidad para desactivar el uso de tus conversaciones para mejorar el producto, si prefieres no compartir eso.</p>`
+    <p class="callout">Puedes revisar y ajustar tus opciones de privacidad en Configuración → Privacidad, incluyendo si tus conversaciones se usan para mejorar el producto.</p>`
   },
   { id:'caso-practico-planilla', icon:'📊', color:'p-teal',
     titulo:'Caso práctico: la planilla que nadie tiene tiempo de leer',
@@ -828,15 +834,17 @@ const LESSONS_DEFAULT = [
   { id:'glosario', icon:'📖', color:'p-teal',
     titulo:'Glosario',
     resumen:'Las palabras que vas a escuchar.',
-    contenido:`<p><b>Skill:</b> instrucción permanente que Claude ejecuta automáticamente.<br>
-    <b>Artefacto:</b> entregable (doc, tabla, dashboard) listo para usar.<br>
+    contenido:`<p><b>Skill:</b> procedimiento fijo que Claude ejecuta automáticamente.<br>
+    <b>Artefacto:</b> entregable (doc, tabla, sitio) listo para usar, separado del chat.<br>
     <b>Conector:</b> integración con Gmail, Calendar, Drive u otro servicio.<br>
     <b>Token:</b> unidad con la que Claude mide el texto — a más texto, más tokens.<br>
-    <b>Cowork:</b> app de escritorio para automatizar tareas sin código.<br>
+    <b>Cowork:</b> el modo de Claude que ejecuta tareas completas por su cuenta.<br>
+    <b>Code:</b> el modo de Claude pensado para programar.<br>
     <b>MCP:</b> protocolo que conecta Claude con sistemas externos.<br>
     <b>Plugin:</b> extensión que amplía lo que Claude puede hacer.<br>
-    <b>Proyecto:</b> contenedor con memoria, archivos e instrucciones fijas.<br>
-    <b>Modelo:</b> Haiku / Sonnet / Opus — de más rápido a más profundo.<br>
+    <b>Proyecto:</b> espacio de trabajo con su propia memoria y archivos.<br>
+    <b>Memoria:</b> lo que Claude recuerda de ti entre conversaciones — editable y visible.<br>
+    <b>Modelo:</b> la "versión" de Claude que responde — de más rápida a más profunda.<br>
     <b>Contexto:</b> toda la información que Claude tiene disponible para responderte bien.</p>`
   }
 ];
@@ -923,6 +931,16 @@ function renderLeccionDetail(editing){
         </div>
       </div>
     ` : `<div class="know-body">${l.contenido}</div>`}
+
+    <div class="subblock" style="margin-top:34px;">
+      <h4>🔗 Referentes de esta lección</h4>
+      <div id="leccionRefList"></div>
+      <form class="comment-form" id="leccionRefForm">
+        <input type="text" name="titulo" placeholder="Título del link" required>
+        <input type="text" name="url" placeholder="https://..." required>
+        <button class="small-btn" type="submit">Agregar</button>
+      </form>
+    </div>
   `;
   document.getElementById('knowBackBtn').addEventListener('click', closeLeccion);
   if (isAdmin){
@@ -931,6 +949,54 @@ function renderLeccionDetail(editing){
       document.getElementById('knowSaveBtn').addEventListener('click', saveLeccion);
     }
   }
+  loadLeccionReferentes();
+  document.getElementById('leccionRefForm').addEventListener('submit', onAddLeccionReferente);
+}
+
+let DEMO_LECCION_REFS = {};
+
+async function loadLeccionReferentes(){
+  let items = [];
+  if (db){
+    const { data } = await db.from('lecciones_referentes').select('*').eq('leccion_id', activeLesson.id).order('created_at', {ascending:false});
+    items = data || [];
+  } else {
+    items = DEMO_LECCION_REFS[activeLesson.id] || [];
+  }
+  const el = document.getElementById('leccionRefList');
+  el.innerHTML = items.length ? items.map(r=>`
+    <div class="comment">
+      <div>🔗 <a href="${r.url}" target="_blank">${r.titulo}</a></div>
+      <button class="comment-delete" data-id="${r.id}" title="Eliminar">✕</button>
+    </div>`).join('') : '<p class="empty-note">Todavía no hay referentes acá. ¡Pega el primero!</p>';
+  el.querySelectorAll('.comment-delete').forEach(btn=>{
+    btn.addEventListener('click', ()=> deleteLeccionReferente(btn.dataset.id));
+  });
+}
+
+async function onAddLeccionReferente(e){
+  e.preventDefault();
+  const form = e.target;
+  const titulo = form.titulo.value.trim();
+  const url = form.url.value.trim();
+  if (!titulo || !url) return;
+  if (db){
+    await db.from('lecciones_referentes').insert({leccion_id: activeLesson.id, titulo, url});
+  } else {
+    DEMO_LECCION_REFS[activeLesson.id] = DEMO_LECCION_REFS[activeLesson.id] || [];
+    DEMO_LECCION_REFS[activeLesson.id].push({id:'demo-'+Date.now(), titulo, url});
+  }
+  form.reset();
+  loadLeccionReferentes();
+}
+
+async function deleteLeccionReferente(id){
+  if (db){
+    await db.from('lecciones_referentes').delete().eq('id', id);
+  } else {
+    DEMO_LECCION_REFS[activeLesson.id] = (DEMO_LECCION_REFS[activeLesson.id]||[]).filter(r=>String(r.id)!==String(id));
+  }
+  loadLeccionReferentes();
 }
 
 async function saveLeccion(){
@@ -954,6 +1020,7 @@ async function saveLeccion(){
 loadLecciones();
 
 
+
 /* ---------------- MI PROYECTO ---------------- */
 const ESTADOS = {
   idea:{label:'Definiendo idea', emoji:'🎨'},
@@ -964,7 +1031,7 @@ const ESTADOS = {
 };
 const ESTADOS_ORDEN = ['idea','escribiendo','desarrollo','publicado'];
 const CARD_COLORS = ['p-lime','p-sky','p-lavender','p-teal','p-gold','p-coral'];
-const PERFILES_FIJOS = ['Papá','Mamá','Florencia','Elisa','Pedro','Nico','Clemente','Jesús'];
+const PERFILES_FIJOS = ['Papá','Mamá','Florencia','Elisa','Pedro','Nico','Clemente','Jesu'];
 
 let DEMO = {
   perfiles: PERFILES_FIJOS.map((nombre,i) => ({id:'demo-'+i, nombre, estado:'idea', link_publicado:'', idea:''})),
