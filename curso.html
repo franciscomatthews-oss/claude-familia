@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curso Familiar · Aprende Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --backdrop:#E7E2D8;
+    --ink:#15140F;
+    --ink-soft:#6f6a5c;
+    --white:#FFFFFF;
+    --cream:#F4F1E9;
+    --lime:#CFF34D;
+    --lime-ink:#2B3300;
+    --sky:#BFE1F0;
+    --lavender:#DCCFF0;
+    --teal:#BDE9DD;
+    --gold:#F3DBA1;
+    --coral:#F0C4B8;
+    --line:#E7E2D8;
+    --radius-lg:28px;
+    --radius-md:18px;
+    --shadow-card: 0 1px 0 rgba(21,20,15,0.04), 0 14px 30px -18px rgba(21,20,15,0.35);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--backdrop); color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    padding:18px;
+    min-height:100vh;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  button{font-family:inherit;}
+
+  .app-shell{
+    max-width:1320px; margin:0 auto;
+    background:var(--white);
+    border-radius:36px;
+    box-shadow: 0 40px 80px -40px rgba(21,20,15,0.35);
+    overflow:hidden;
+  }
+
+  /* ---------------- top nav ---------------- */
+  .topnav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 28px; flex-wrap:wrap; gap:16px;
+  }
+  .logo{
+    width:42px; height:42px; border-radius:50%;
+    background:var(--lime); display:flex; align-items:center; justify-content:center;
+    font-size:1.2rem;
+  }
+  .nav-pill{
+    display:flex; gap:2px; background:var(--cream); padding:5px; border-radius:99px;
+  }
+  .nav-item{
+    border:none; background:transparent; padding:10px 20px; border-radius:99px;
+    font-weight:600; font-size:.88rem; cursor:pointer; color:var(--ink-soft);
+    transition:background .15s ease, color .15s ease;
+  }
+  .nav-item.active{background:var(--ink); color:var(--white);}
+  .nav-item:hover:not(.active){color:var(--ink);}
+  .nav-right{display:flex; align-items:center; gap:10px;}
+  .cta-pill{
+    display:flex; align-items:center; gap:8px;
+    border:1.5px solid var(--ink); background:transparent; color:var(--ink);
+    padding:10px 18px; border-radius:99px; font-weight:700; font-size:.85rem; cursor:pointer;
+  }
+  .cta-pill:hover{background:var(--ink); color:var(--white);}
+  .icon-circle{
+    width:40px; height:40px; border-radius:50%; border:none; background:var(--cream);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem;
+  }
+
+  main{padding:8px 28px 60px;}
+  .view{display:none;}
+  .view.active{display:block; animation:fadeUp .5s ease both;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ---------------- hero ---------------- */
+  .hero-row{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:20px;
+    margin-top:26px; flex-wrap:wrap;
+  }
+  .eyebrow{
+    text-transform:uppercase; letter-spacing:.12em; font-size:.76rem; font-weight:700;
+    color:var(--ink-soft); margin:0 0 12px;
+  }
+  .hero-title{
+    font-size:clamp(2.1rem, 4.6vw, 3.5rem); font-weight:800; line-height:1.06; margin:0;
+    max-width:680px;
+  }
+  .carousel-arrows{display:flex; gap:10px;}
+  .arrow-btn{
+    width:48px; height:48px; border-radius:50%; border:1.5px solid var(--ink);
+    background:var(--white); font-size:1.3rem; cursor:pointer; color:var(--ink);
+  }
+  .arrow-btn.dark{background:var(--ink); color:var(--white); border-color:var(--ink);}
+  .hero-desc{
+    max-width:560px; color:var(--ink-soft); font-size:1.02rem; line-height:1.6;
+    margin:18px 0 32px;
+  }
+
+  .card-carousel{
+    display:flex; gap:18px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory;
+  }
+  .card-carousel::-webkit-scrollbar{height:6px;}
+  .card-carousel::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px;}
+  .intro-card{
+    flex:0 0 260px; scroll-snap-align:start;
+    border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-card);
+    display:flex; flex-direction:column; background:var(--cream);
+  }
+  .intro-top{padding:20px 20px 24px;}
+  .intro-top.top-lime{background:var(--lime); color:var(--lime-ink);}
+  .tag-row{display:flex; gap:6px; justify-content:space-between; align-items:flex-start; margin-bottom:26px;}
+  .tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .pill-tag{
+    background:var(--white); border-radius:99px; padding:5px 11px; font-size:.72rem; font-weight:700;
+  }
+  .icon-dot{
+    width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.6);
+    display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0;
+  }
+  .intro-top h3{font-size:1.35rem; margin:0 0 8px; font-weight:800; line-height:1.15;}
+  .intro-top p{margin:0; font-size:.85rem; line-height:1.5; opacity:.85;}
+  .intro-block{
+    flex:1; min-height:190px; position:relative; display:flex; align-items:center; justify-content:center;
+    font-size:3.4rem;
+  }
+  .block-sky{background:var(--sky);}
+  .block-lavender{background:var(--lavender);}
+  .block-teal{background:var(--teal);}
+  .block-gold{background:var(--gold);}
+  .read-more{
+    position:absolute; left:14px; bottom:14px;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(21,20,15,.72); color:var(--white); border:none;
+    padding:9px 14px; border-radius:99px; font-size:.76rem; font-weight:700; cursor:pointer;
+    backdrop-filter:blur(2px);
+  }
+
+  /* ---------------- section headers (shared) ---------------- */
+  .section-head{margin-top:52px; margin-bottom:22px;}
+  .section-head h2{font-size:1.9rem; font-weight:800; margin:0 0 8px;}
+  .section-head p{color:var(--ink-soft); margin:0; max-width:560px; line-height:1.5;}
+
+  /* ---------------- conocimiento: acordeon ---------------- */
+  .accordion{display:flex; flex-direction:column; gap:12px;}
+  .accordion-item{
+    background:var(--cream); border-radius:var(--radius-md); overflow:hidden;
+  }
+  .accordion-trigger{
+    width:100%; display:flex; align-items:center; gap:14px; justify-content:space-between;
+    background:none; border:none; padding:18px 22px; cursor:pointer; text-align:left;
+  }
+  .accordion-trigger .left{display:flex; align-items:center; gap:14px;}
+  .accordion-trigger .num{font-family:'JetBrains Mono', monospace; font-size:.75rem; color:var(--ink-soft); width:22px;}
+  .accordion-trigger .ic{
+    width:38px; height:38px; border-radius:50%; background:var(--white); display:flex;
+    align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
+  }
+  .accordion-trigger h3{margin:0; font-size:1.05rem; font-weight:700;}
+  .chevron{transition:transform .25s ease; font-size:1.1rem; color:var(--ink-soft);}
+  .accordion-item.open .chevron{transform:rotate(180deg);}
+  .accordion-content-wrap{display:grid; grid-template-rows:0fr; transition:grid-template-rows .35s ease;}
+  .accordion-item.open .accordion-content-wrap{grid-template-rows:1fr;}
+  .accordion-content-inner{overflow:hidden;}
+  .accordion-body{padding:0 22px 26px 74px; color:var(--ink); line-height:1.7; font-size:.94rem;}
+  .accordion-body p{margin:0 0 12px;}
+  .accordion-body ul{margin:0 0 12px; padding-left:18px;}
+  .accordion-body li{margin-bottom:6px;}
+
+  .tip-box{
+    margin-top:6px; padding:14px 16px; background:var(--gold); border-radius:14px; font-size:.88rem;
+  }
+  .tip-box b{font-weight:800;}
+
+  .prompt-card{
+    background:var(--white); border-radius:12px; padding:12px 14px; margin-bottom:8px;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+  }
+  .prompt-card p{margin:0; font-family:'JetBrains Mono', monospace; font-size:.78rem; line-height:1.5;}
+  .copy-btn{
+    flex-shrink:0; border:1.5px solid var(--ink); background:var(--white);
+    border-radius:99px; padding:6px 12px; font-size:.74rem; cursor:pointer; font-weight:700;
+  }
+  .copy-btn.copied{background:var(--lime); border-color:var(--lime);}
+
+  /* ---------------- mi proyecto ---------------- */
+  .demo-banner{
+    background:var(--sky); border-radius:14px; padding:14px 18px; margin-bottom:22px; font-size:.86rem; line-height:1.5;
+  }
+  .demo-banner code{background:rgba(0,0,0,.08); padding:1px 5px; border-radius:4px;}
+
+  .perfiles-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:18px;
+  }
+  .perfil-card{
+    position:relative; border-radius:var(--radius-md); padding:22px 18px 20px;
+    box-shadow:var(--shadow-card); cursor:pointer; overflow:hidden;
+  }
+  .perfil-card.p-lime{background:var(--lime);}
+  .perfil-card.p-sky{background:var(--sky);}
+  .perfil-card.p-lavender{background:var(--lavender);}
+  .perfil-card.p-teal{background:var(--teal);}
+  .perfil-card.p-gold{background:var(--gold);}
+  .delete-x{
+    position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%;
+    border:none; background:rgba(255,255,255,.7); font-size:.8rem; cursor:pointer; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .delete-x:hover{background:var(--white);}
+  .perfil-nombre{font-weight:800; font-size:1.1rem; text-transform:uppercase; margin:6px 0 10px; letter-spacing:.01em;}
+  .estado-badge{
+    display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.65);
+    font-size:.74rem; font-weight:700; padding:5px 10px; border-radius:99px;
+  }
+  .add-card{
+    border:2px dashed var(--line); border-radius:var(--radius-md); padding:22px 18px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    color:var(--ink-soft); cursor:pointer; text-align:center; min-height:132px;
+  }
+  .add-card:hover{border-color:var(--ink); color:var(--ink);}
+  .add-card .plus{font-size:1.8rem; font-weight:800;}
+  .add-form{display:none; flex-direction:column; gap:8px; width:100%;}
+  .add-form.show{display:flex;}
+  .add-form input{
+    border:1.5px solid var(--line); border-radius:10px; padding:9px 10px; font-size:.85rem; font-family:inherit;
+  }
+  .add-form .row{display:flex; gap:8px;}
+  .add-form button{
+    border:none; background:var(--ink); color:var(--white); border-radius:10px; padding:9px 12px;
+    font-weight:700; font-size:.82rem; cursor:pointer; flex:1;
+  }
+  .add-form .cancel{background:var(--cream); color:var(--ink);}
+
+  /* detail panel */
+  .detail-panel{margin-top:26px; padding:26px 26px 30px; background:var(--cream); border-radius:var(--radius-lg); display:none;}
+  .detail-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:20px;}
+  .detail-head h2{margin:0 0 8px; text-transform:uppercase; font-size:1.5rem;}
+  .estado-select{
+    font-family:inherit; font-size:.85rem; padding:8px 12px; border-radius:10px; border:1.5px solid var(--line); background:var(--white);
+  }
+  .grid-2{display:grid; grid-template-columns:1.3fr 1fr; gap:22px;}
+  @media (max-width:760px){.grid-2{grid-template-columns:1fr;}}
+
+  .dropzone{
+    border:2px dashed var(--line); border-radius:14px; padding:26px 16px; background:var(--white);
+    text-align:center; color:var(--ink-soft); font-size:.88rem; cursor:pointer;
+  }
+  .dropzone.drag{border-color:var(--ink); background:var(--lime);}
+  .dropzone input{display:none;}
+
+  .md-render{
+    margin-top:14px; padding:18px 20px; background:var(--white); border-radius:14px;
+    max-height:400px; overflow:auto; font-size:.9rem; line-height:1.6;
+  }
+  .md-render code{font-family:'JetBrains Mono', monospace; background:rgba(0,0,0,.06); padding:1px 5px; border-radius:4px;}
+  .empty-note{color:var(--ink-soft); font-size:.86rem; font-style:italic;}
+
+  .subblock{margin-top:20px;}
+  .subblock h4{margin:0 0 10px; font-size:.92rem; font-weight:800;}
+  .comment{background:var(--white); border-radius:12px; padding:10px 14px; margin-bottom:8px; font-size:.87rem;}
+  .comment b{font-weight:800;}
+  .comment-form, .tip-form{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .comment-form input, .tip-form input{
+    font-family:inherit; font-size:.85rem; border:1.5px solid var(--line); border-radius:10px; padding:8px 10px; background:var(--white);
+  }
+  .comment-form input[name="autor"]{width:110px;}
+  .comment-form input[name="texto"], .tip-form input{flex:1; min-width:140px;}
+  .small-btn{border:none; background:var(--ink); color:var(--white); border-radius:10px; padding:8px 14px; font-size:.82rem; font-weight:700; cursor:pointer;}
+  .tip-item{background:var(--gold); border-radius:12px; padding:9px 13px; margin-bottom:8px; font-size:.86rem;}
+  .back-link{background:none; border:none; color:var(--ink-soft); font-size:.85rem; cursor:pointer; margin-bottom:14px; font-weight:700;}
+
+  footer{text-align:center; padding:26px; color:var(--ink-soft); font-size:.78rem;}
+
+  @media (max-width:640px){
+    .nav-pill{order:3; width:100%; justify-content:center;}
+    .topnav{justify-content:center;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="topnav">
+    <div class="logo">✺</div>
+    <nav class="nav-pill">
+      <button class="nav-item active" data-view="inicio">Inicio</button>
+      <button class="nav-item" data-view="conocimiento">Conocimiento</button>
+      <button class="nav-item" data-view="proyecto">Mi Proyecto</button>
+    </nav>
+    <div class="nav-right">
+      <button class="cta-pill" data-goto="proyecto">Mi Proyecto <span>→</span></button>
+      <button class="icon-circle" title="Ayuda">?</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ INICIO ============ -->
+    <section id="view-inicio" class="view active">
+      <div class="hero-row">
+        <div>
+          <p class="eyebrow">Curso familiar · Aprende con IA</p>
+          <h1 class="hero-title">Aprende a crear con Claude, en familia.</h1>
+        </div>
+        <div class="carousel-arrows">
+          <button class="arrow-btn" id="carouselPrev">‹</button>
+          <button class="arrow-btn dark" id="carouselNext">›</button>
+        </div>
+      </div>
+      <p class="hero-desc">Un cuaderno de proyecto hecho en familia: acá aprendemos juntos, a nuestro ritmo, a usar Claude para armar lo que se nos ocurra — sin saber programar. Este mismo sitio es nuestro primer proyecto hecho así.</p>
+
+      <div class="card-carousel" id="introCards"></div>
+    </section>
+
+    <!-- ============ CONOCIMIENTO ============ -->
+    <section id="view-conocimiento" class="view">
+      <div class="section-head">
+        <h2>📚 Conocimiento</h2>
+        <p>Diez lecciones para ir de cero a publicado. Toca cada una para abrirla.</p>
+      </div>
+      <div class="accordion" id="accordion"></div>
+    </section>
+
+    <!-- ============ MI PROYECTO ============ -->
+    <section id="view-proyecto" class="view">
+      <div class="section-head">
+        <h2>🚀 Mi Proyecto</h2>
+        <p>El perfil de seguimiento de cada uno: sube tu <span class="mono">.md</span>, recibe comentarios y tips. Agrega o quita a quien quieras.</p>
+      </div>
+
+      <div id="demoBanner" class="demo-banner" style="display:none;">
+        Modo <b>demo</b>: no hay base de datos conectada, así que los cambios no se guardan al recargar.
+        Para activarlo de verdad: crea tu proyecto en <a href="https://supabase.com" target="_blank">supabase.com</a>, corre <code>supabase-schema.sql</code>, y reemplaza <code>SUPABASE_URL</code> / <code>SUPABASE_ANON_KEY</code> en el código.
+      </div>
+
+      <div class="perfiles-grid" id="perfilesGrid"></div>
+
+      <div class="detail-panel" id="detailPanel"></div>
+    </section>
+
+  </main>
+
+  <footer>Hecho en familia, con Claude. · <span id="yearNow"></span></footer>
+</div>
+
+<script>
+/* =====================================================
+   CONFIG — reemplaza esto con los datos de TU proyecto Supabase
+   (Settings → API, dentro de tu proyecto en supabase.com)
+   ===================================================== */
+const SUPABASE_URL = "TU_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "TU_SUPABASE_ANON_KEY";
+const STORAGE_BUCKET = "curso-familia";
+
+let db = null;
+const isConfigured = SUPABASE_URL !== "TU_SUPABASE_URL" && SUPABASE_ANON_KEY !== "TU_SUPABASE_ANON_KEY";
+if (isConfigured && window.supabase) {
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+document.getElementById('yearNow').textContent = new Date().getFullYear();
+
+/* ---------------- navegación entre vistas ---------------- */
+function goto(view){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelector('.nav-item[data-view="' + view + '"]').classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.nav-item').forEach(t => t.addEventListener('click', () => goto(t.dataset.view)));
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => goto(b.dataset.goto)));
+
+/* ---------------- INICIO: cards intro ---------------- */
+const INTRO_CARDS = [
+  {tags:['Para todos','Nivel: cero'], icon:'🧭', title:'¿Qué vamos a hacer?', desc:'Cada integrante elige una idea propia y la construye con ayuda de Claude, en simple, paso a paso.', top:'top-lime', block:'🧩', blockColor:'block-sky'},
+  {tags:['IA conversacional','Sin código'], icon:'🤖', title:'¿Por qué Claude?', desc:'Le explicas tu idea en palabras simples y te ayuda a convertirla en un sitio real, funcionando.', top:'', block:'💬', blockColor:'block-lavender'},
+  {tags:['Antes de empezar','5 minutos'], icon:'🎒', title:'¿Qué necesito?', desc:'Solo una idea, aunque esté a medio pensar, y ganas de probar. Lo demás lo vemos juntos.', top:'', block:'🗂️', blockColor:'block-teal'},
+  {tags:['Primer paso','Hoy mismo'], icon:'🚀', title:'¿Cómo empiezo?', desc:'Lee Conocimiento y crea tu perfil en Mi Proyecto para registrar tu avance, semana a semana.', top:'', block:'✨', blockColor:'block-gold'}
+];
+
+function renderIntroCards(){
+  const el = document.getElementById('introCards');
+  el.innerHTML = INTRO_CARDS.map(c => `
+    <div class="intro-card">
+      <div class="intro-top ${c.top}">
+        <div class="tag-row">
+          <div class="tags">${c.tags.map(t=>`<span class="pill-tag">${t}</span>`).join('')}</div>
+          <div class="icon-dot">${c.icon}</div>
+        </div>
+        <h3>${c.title}</h3>
+        <p>${c.desc}</p>
+      </div>
+      <div class="intro-block ${c.blockColor}">
+        <span>${c.block}</span>
+        <button class="read-more" data-goto="conocimiento">Leer más <span>→</span></button>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.read-more').forEach(b => b.addEventListener('click', () => goto('conocimiento')));
+}
+renderIntroCards();
+
+document.getElementById('carouselNext').addEventListener('click', () => {
+  document.getElementById('introCards').scrollBy({left:280, behavior:'smooth'});
+});
+document.getElementById('carouselPrev').addEventListener('click', () => {
+  document.getElementById('introCards').scrollBy({left:-280, behavior:'smooth'});
+});
+
+/* ---------------- CONOCIMIENTO: lecciones (acordeon) ---------------- */
+const LESSONS = [
+  {
+    icon:'💬', title:'¿Qué es Claude y qué puede hacer?',
+    body:`<p>Claude es un asistente de inteligencia artificial con el que conversas escribiendo, como en un chat. La diferencia con un buscador es que <b>entiende contexto</b> y puede producir cosas completas: texto, código, documentos, hojas de cálculo, presentaciones y sitios web enteros, como este.</p>
+    <p>No hace falta saber programar para pedirle que te arme algo — sí ayuda ser claro sobre qué quieres lograr y darle espacio para que te pregunte.</p>
+    <p><b>En la práctica:</b> puedes pedirle desde cosas chicas ("resume este texto") hasta proyectos completos ("arma un sitio para llevar el inventario de mi taller"). La clave está en ir de a poco: primero algo simple que funcione, después se mejora.</p>`,
+    tip:'Trátalo como a alguien nuevo en el proyecto: mientras más contexto le des, mejor responde.'
+  },
+  {
+    icon:'📄', title:'La idea central: pedir con un documento .md',
+    body:`<p>Un archivo <span class="mono">.md</span> (markdown) es texto plano organizado con títulos y listas. Cuando le escribes a Claude un documento así describiendo tu proyecto, le das <b>memoria real</b>: no tienes que explicar todo de nuevo cada vez que abres una conversación nueva, solo le pegas el documento.</p>
+    <p>Este mismo sitio nació de un <span class="mono">.md</span> así, y ese mismo documento se sigue actualizando a medida que el proyecto crece — es la fuente de verdad.</p>
+    <ul><li>Qué es el proyecto, en una frase.</li><li>Qué funciones necesita.</li><li>Qué datos va a guardar.</li><li>Cómo se ve en pantalla.</li></ul>`,
+    tip:'Guarda siempre la última versión de tu .md — es el "cerebro" de tu proyecto.'
+  },
+  {
+    icon:'✍️', title:'Cómo se escribe un buen prompt',
+    body:`<p>Un buen prompt (la instrucción que le escribes a Claude) tiene tres partes: <b>contexto</b> (qué estás construyendo), <b>objetivo</b> (qué quieres que haga ahora) y <b>ejemplo</b> (algo parecido, si lo tienes).</p>
+    <p>No hace falta acertar a la primera: pídele que primero te muestre un plan corto antes de escribir código, y ajusta desde ahí. Si algo no te convence, dilo directo — "esto no, prefiero que..." — Claude ajusta sin problema.</p>
+    <p><b>Compara:</b> "hazme un dashboard" da resultados genéricos. "Hazme un dashboard para anotar mis gastos del mes, con columnas de fecha, monto y categoría, y un gráfico simple" ya le da forma concreta a lo que quieres.</p>`,
+    tip:'Sé específico sobre el resultado que imaginas, no solo sobre el tema general.'
+  },
+  {
+    icon:'🌱', title:'De la idea al .md',
+    body:`<p>No necesitas un documento perfecto para arrancar. Una plantilla mínima que funciona:</p>
+    <p><b>Qué es</b> → una frase de qué hace tu proyecto.<br>
+    <b>Qué necesito que haga</b> → lista de funciones, aunque sea corta.<br>
+    <b>Qué datos vas a guardar</b> → lo que tu app tiene que "recordar" entre visitas.<br>
+    <b>Qué se ve en pantalla</b> → cómo te imaginas que luce, aunque sea a grandes rasgos.</p>
+    <p>Con eso, Claude ya puede proponerte una primera versión y de ahí seguimos afinando juntos, sección por sección.</p>`,
+    tip:'Escribe tu primer .md aunque sea "a medio pensar" — se edita después, en Mi Proyecto.'
+  },
+  {
+    icon:'🛠️', title:'Cómo pedirle que te arme un dashboard o app',
+    body:`<p>El flujo real es: describes el objetivo → Claude propone una estructura → le pides ajustes → te entrega el código completo → lo subes a GitHub → el sitio se publica solo.</p>
+    <p>Puedes pedir cambios de a poco: "agrégale una pestaña más", "cambia estos colores", "que el botón haga esto otro". Cada iteración es una conversación normal, sin límite de vueltas.</p>
+    <p><b>Tip de flujo:</b> si el proyecto crece, pide primero un plan de secciones antes de construir todo de una vez — así evitas rehacer trabajo.</p>`,
+    tip:'Pide siempre "dame el archivo completo", no solo el fragmento que cambió — evitas errores al copiar.'
+  },
+  {
+    icon:'🌐', title:'Publicar gratis (GitHub + Vercel)',
+    body:`<p>GitHub guarda tu código. Vercel lo convierte en un sitio real con link público, gratis, y cada vez que subes un cambio a GitHub, Vercel actualiza el sitio solo, en menos de un minuto.</p>
+    <p>Resumen de pasos: crear cuenta en ambos → crear un repositorio → subir tu archivo <span class="mono">index.html</span> → conectar ese repositorio a Vercel → listo, tienes un link para compartir.</p>
+    <p>El subdominio que te da Vercel (tipo <span class="mono">tu-proyecto.vercel.app</span>) es gratis para siempre. Un dominio propio (tipo <span class="mono">tuproyecto.cl</span>) tiene costo anual, y es opcional.</p>`,
+    tip:'Para actualizar: sube el archivo nuevo a GitHub reemplazando el anterior — no hay que reconectar nada.'
+  },
+  {
+    icon:'🗄️', title:'Guardar datos con Supabase, sin saber de bases de datos',
+    body:`<p>Un sitio simple "olvida todo" al recargar la página. Supabase es un servicio gratuito que le da a tu sitio una base de datos real: una "tabla" es como una hoja de cálculo donde cada fila es un dato guardado (un comentario, un archivo subido, un puntaje).</p>
+    <p>No hace falta escribir la base de datos desde cero: le pides a Claude el "script SQL" y solo lo pegas en Supabase, en la sección SQL Editor, y presionas Run.</p>
+    <p>Supabase también guarda archivos (fotos, documentos) en su "Storage", y puede manejar inicio de sesión si más adelante quieren que cada quien entre con su clave.</p>`,
+    tip:'Guarda en un lugar seguro la URL y la clave de tu proyecto Supabase — son las que conectan tu sitio con sus datos.'
+  },
+  {
+    icon:'📖', title:'Glosario para principiantes',
+    body:`<p><b>Repositorio (repo):</b> la carpeta de tu proyecto en GitHub.<br>
+    <b>Deploy:</b> el momento en que tu sitio se publica o actualiza.<br>
+    <b>Base de datos:</b> donde tu sitio guarda información entre visitas.<br>
+    <b>Prompt:</b> la instrucción que le escribes a Claude.<br>
+    <b>Variable:</b> un dato con nombre que tu código puede reutilizar.<br>
+    <b>Frontend:</b> lo que ves y tocas en pantalla.<br>
+    <b>Backend:</b> lo que pasa "detrás", como guardar datos.<br>
+    <b>API key / credencial:</b> una clave secreta que conecta tu sitio con un servicio — nunca se comparte en el chat.</p>`,
+    tip:'No necesitas memorizar esto — vuelve aquí cada vez que una palabra te suene rara.'
+  },
+  {
+    icon:'📋', title:'Banco de prompts de ejemplo',
+    body:`<p>Cópialos y ajústalos a tu idea:</p>`,
+    tip:'Empieza siempre pidiendo un plan antes que código: te ahorra vueltas.',
+    prompts:[
+      "Quiero armar un dashboard para llevar mis gastos del mes, con columnas de fecha, monto, categoría y un gráfico de torta. Antes de programar, muéstrame un plan simple.",
+      "Tengo esta idea: [describe tu idea en 2-3 frases]. Ayúdame a convertirla en un documento .md con secciones: qué es, qué necesita hacer, qué datos guarda, cómo se ve.",
+      "Aquí está mi .md de proyecto [pégalo]. Empecemos por la pantalla principal, en HTML y CSS simple, sin librerías pesadas.",
+      "Este es el error que me sale: [pega el error o descríbelo]. Esto fue lo último que cambié: [explica]. ¿Qué puede estar pasando?",
+      "Quiero agregarle a mi sitio una sección de [lo que quieras]. Este es el archivo actual completo: [pégalo]. Dame el archivo completo actualizado.",
+      "Ayúdame a escribir el script SQL para guardar [describe qué datos], pensando en que después lo voy a correr en Supabase."
+    ]
+  },
+  {
+    icon:'🧯', title:'Errores comunes y cómo pedir ayuda',
+    body:`<p>Que algo "se rompa" es parte normal de construir — no significa que hiciste algo mal. Cuando pase:</p>
+    <p>1) Copia el mensaje de error completo, o describe qué esperabas que pasara y qué pasó en cambio.<br>
+    2) Dile a Claude qué fue lo último que cambiaste.<br>
+    3) Pide que te explique la causa antes de solo "arreglarlo", así aprendes para la próxima.</p>
+    <p>Si el sitio publicado se ve distinto al que probaste en tu computador, casi siempre es caché del navegador: prueba recargar con Cmd/Ctrl+Shift+R.</p>`,
+    tip:'Siempre puedes volver a la versión anterior del archivo — nada se pierde para siempre.'
+  }
+];
+
+function renderAccordion(){
+  const el = document.getElementById('accordion');
+  el.innerHTML = LESSONS.map((l,i) => {
+    let promptsHtml = '';
+    if (l.prompts){
+      promptsHtml = l.prompts.map((p,pi)=>`
+        <div class="prompt-card">
+          <p>${p}</p>
+          <button class="copy-btn" data-prompt="${pi}" data-lesson="${i}">Copiar</button>
+        </div>`).join('');
+    }
+    return `
+    <div class="accordion-item" data-i="${i}">
+      <button class="accordion-trigger">
+        <div class="left">
+          <span class="num">${String(i+1).padStart(2,'0')}</span>
+          <span class="ic">${l.icon}</span>
+          <h3>${l.title}</h3>
+        </div>
+        <span class="chevron">⌄</span>
+      </button>
+      <div class="accordion-content-wrap"><div class="accordion-content-inner">
+        <div class="accordion-body">
+          ${l.body}${promptsHtml}
+          <div class="tip-box"><b>✎ Tip —</b> ${l.tip}</div>
+        </div>
+      </div></div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.accordion-trigger').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = btn.closest('.accordion-item');
+      const wasOpen = item.classList.contains('open');
+      el.querySelectorAll('.accordion-item').forEach(it=>it.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+  el.querySelectorAll('.copy-btn').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const lesson = LESSONS[+btn.dataset.lesson];
+      const text = lesson.prompts[+btn.dataset.prompt];
+      try{ await navigator.clipboard.writeText(text); }catch(err){}
+      btn.textContent = '¡Copiado!'; btn.classList.add('copied');
+      setTimeout(()=>{ btn.textContent='Copiar'; btn.classList.remove('copied'); }, 1600);
+    });
+  });
+  el.querySelector('.accordion-item').classList.add('open');
+}
+renderAccordion();
+
+/* ---------------- MI PROYECTO ---------------- */
+const ESTADOS = {
+  idea:{label:'Definiendo idea', emoji:'🎨'},
+  escribiendo:{label:'Escribiendo el .md', emoji:'🟡'},
+  desarrollo:{label:'En desarrollo', emoji:'🟢'},
+  publicado:{label:'Publicado', emoji:'🔵'},
+  pausado:{label:'Pausado', emoji:'⏸'}
+};
+const CARD_COLORS = ['p-lime','p-sky','p-lavender','p-teal','p-gold'];
+
+let DEMO = {
+  perfiles:[
+    {id:'demo-1', nombre:'Francisco', estado:'idea', link_publicado:''},
+    {id:'demo-2', nombre:'Amelia', estado:'idea', link_publicado:''},
+    {id:'demo-3', nombre:'Samir', estado:'idea', link_publicado:''}
+  ],
+  mdPorPerfil:{}, comentarios:{}, tips:{}
+};
+
+let perfiles = [];
+let activePerfil = null;
+
+async function loadPerfiles(){
+  if (db){
+    const {data, error} = await db.from('perfiles').select('*').order('created_at');
+    perfiles = error ? [] : data;
+  } else {
+    document.getElementById('demoBanner').style.display = 'block';
+    perfiles = DEMO.perfiles;
+  }
+  renderPerfiles();
+}
+
+function renderPerfiles(){
+  const grid = document.getElementById('perfilesGrid');
+  grid.innerHTML = perfiles.map((p,i)=>{
+    const e = ESTADOS[p.estado] || ESTADOS.idea;
+    const color = CARD_COLORS[i % CARD_COLORS.length];
+    return `
+      <div class="perfil-card ${color}" data-id="${p.id}">
+        <button class="delete-x" data-del="${p.id}" title="Eliminar">✕</button>
+        <div class="perfil-nombre">${p.nombre}</div>
+        <span class="estado-badge">${e.emoji} ${e.label}</span>
+      </div>`;
+  }).join('') + `
+      <div class="add-card" id="addCardBtn">
+        <span class="plus">+</span>
+        <span>Agregar integrante</span>
+        <form class="add-form" id="addForm">
+          <input type="text" name="nombre" placeholder="Nombre" required autocomplete="off">
+          <div class="row">
+            <button type="submit">Crear</button>
+            <button type="button" class="cancel" id="cancelAdd">Cancelar</button>
+          </div>
+        </form>
+      </div>`;
+
+  grid.querySelectorAll('.perfil-card').forEach(card=>{
+    card.addEventListener('click', (e)=>{
+      if (e.target.closest('.delete-x')) return;
+      openPerfil(card.dataset.id);
+    });
+  });
+  grid.querySelectorAll('.delete-x').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); deletePerfil(btn.dataset.del); });
+  });
+
+  const addCard = document.getElementById('addCardBtn');
+  const addForm = document.getElementById('addForm');
+  addCard.addEventListener('click', (e)=>{
+    if (addForm.classList.contains('show')) return;
+    addForm.classList.add('show');
+    addCard.querySelector('.plus').style.display='none';
+    addCard.querySelector('span:not(.plus)').style.display='none';
+    addForm.querySelector('input').focus();
+  });
+  document.getElementById('cancelAdd').addEventListener('click', (e)=>{ e.stopPropagation(); renderPerfiles(); });
+  addForm.addEventListener('click', e=> e.stopPropagation());
+  addForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const nombre = e.target.nombre.value.trim();
+    if (!nombre) return;
+    if (db){
+      await db.from('perfiles').insert({nombre, estado:'idea'});
+    } else {
+      DEMO.perfiles.push({id:'demo-'+Date.now(), nombre, estado:'idea', link_publicado:''});
+    }
+    loadPerfiles();
+  });
+}
+
+async function deletePerfil(id){
+  const p = perfiles.find(p=>p.id===id);
+  if (!p) return;
+  if (!confirm('¿Eliminar el perfil de ' + p.nombre + '? Se borrarán también su .md, comentarios y tips.')) return;
+  if (db){
+    await db.from('perfiles').delete().eq('id', id);
+  } else {
+    DEMO.perfiles = DEMO.perfiles.filter(x=>x.id!==id);
+  }
+  if (activePerfil && activePerfil.id === id){
+    document.getElementById('detailPanel').style.display = 'none';
+    activePerfil = null;
+  }
+  loadPerfiles();
+}
+
+async function openPerfil(id){
+  activePerfil = perfiles.find(p=>p.id===id);
+  if (!activePerfil) return;
+  const panel = document.getElementById('detailPanel');
+  panel.style.display = 'block';
+
+  panel.innerHTML = `
+    <button class="back-link" id="backBtn">← Volver a todos los proyectos</button>
+    <div class="detail-head">
+      <div>
+        <h2>${activePerfil.nombre}</h2>
+        <select class="estado-select" id="estadoSelect">
+          ${Object.entries(ESTADOS).map(([k,v])=>`<option value="${k}" ${k===activePerfil.estado?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
+        </select>
+      </div>
+      <div style="text-align:right;">
+        <div class="empty-note" style="margin-bottom:4px;">Link publicado</div>
+        <input class="mono" id="linkInput" placeholder="https://..." value="${activePerfil.link_publicado||''}"
+          style="font-size:.82rem; padding:8px 10px; border:1.5px solid var(--line); border-radius:10px; width:220px;">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="dropzone" id="dropzone">
+          📎 Arrastra tu archivo <span class="mono">.md</span> aquí, o haz click para elegirlo
+          <input type="file" id="fileInput" accept=".md,text/markdown">
+        </div>
+        <div class="md-render" id="mdRender"><p class="empty-note">Todavía no se ha subido ningún documento de proyecto.</p></div>
+      </div>
+
+      <div>
+        <div class="subblock">
+          <h4>💬 Comentarios de la familia</h4>
+          <div id="comentariosList"></div>
+          <form class="comment-form" id="comentarioForm">
+            <input name="autor" placeholder="Tu nombre" required>
+            <input name="texto" placeholder="Escribe un comentario o ánimo..." required>
+            <button class="small-btn" type="submit">Enviar</button>
+          </form>
+        </div>
+        <div class="subblock">
+          <h4>✎ Tips para este proyecto</h4>
+          <div id="tipsList"></div>
+          <form class="tip-form" id="tipForm">
+            <input name="texto" placeholder="Agregar un tip..." required>
+            <button class="small-btn" type="submit">Agregar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('backBtn').addEventListener('click', ()=>{ panel.style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); });
+  document.getElementById('estadoSelect').addEventListener('change', onEstadoChange);
+  document.getElementById('linkInput').addEventListener('change', onLinkChange);
+  setupDropzone();
+  await loadMd();
+  await loadComentarios();
+  await loadTips();
+
+  document.getElementById('comentarioForm').addEventListener('submit', onAddComentario);
+  document.getElementById('tipForm').addEventListener('submit', onAddTip);
+
+  panel.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+async function onEstadoChange(e){
+  const nuevoEstado = e.target.value;
+  activePerfil.estado = nuevoEstado;
+  if (db){ await db.from('perfiles').update({estado:nuevoEstado}).eq('id', activePerfil.id); }
+  renderPerfiles();
+}
+async function onLinkChange(e){
+  activePerfil.link_publicado = e.target.value;
+  if (db){ await db.from('perfiles').update({link_publicado:e.target.value}).eq('id', activePerfil.id); }
+}
+
+function setupDropzone(){
+  const zone = document.getElementById('dropzone');
+  const input = document.getElementById('fileInput');
+  zone.addEventListener('click', ()=> input.click());
+  input.addEventListener('change', ()=> handleFile(input.files[0]));
+  ['dragenter','dragover'].forEach(evt => zone.addEventListener(evt, e=>{ e.preventDefault(); zone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e=>{ e.preventDefault(); zone.classList.remove('drag'); }));
+  zone.addEventListener('drop', e=>{ if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+}
+
+async function handleFile(file){
+  if (!file) return;
+  const text = await file.text();
+  if (db){
+    const { data: existing } = await db.from('proyectos_md').select('version').eq('perfil_id', activePerfil.id).order('version', {ascending:false}).limit(1);
+    const nextVersion = existing && existing.length ? existing[0].version + 1 : 1;
+    await db.from('proyectos_md').insert({perfil_id:activePerfil.id, nombre_archivo:file.name, contenido:text, version:nextVersion});
+    await db.storage.from(STORAGE_BUCKET).upload(`${activePerfil.id}/v${nextVersion}-${file.name}`, file, {upsert:true}).catch(()=>{});
+  } else {
+    DEMO.mdPorPerfil[activePerfil.id] = text;
+  }
+  renderMd(text);
+}
+function renderMd(text){ document.getElementById('mdRender').innerHTML = marked.parse(text); }
+
+async function loadMd(){
+  if (db){
+    const { data } = await db.from('proyectos_md').select('contenido').eq('perfil_id', activePerfil.id).order('version', {ascending:false}).limit(1);
+    if (data && data.length) renderMd(data[0].contenido);
+  } else if (DEMO.mdPorPerfil[activePerfil.id]) {
+    renderMd(DEMO.mdPorPerfil[activePerfil.id]);
+  }
+}
+
+async function loadComentarios(){
+  let items = [];
+  if (db){
+    const { data } = await db.from('comentarios').select('*').eq('perfil_id', activePerfil.id).order('created_at');
+    items = data || [];
+  } else { items = DEMO.comentarios[activePerfil.id] || []; }
+  renderComentarios(items);
+}
+function renderComentarios(items){
+  const el = document.getElementById('comentariosList');
+  el.innerHTML = items.length ? items.map(c=>`<div class="comment"><b>${c.autor}</b> — ${c.texto}</div>`).join('') : '<p class="empty-note">Todavía no hay comentarios. ¡Deja el primero!</p>';
+}
+async function onAddComentario(e){
+  e.preventDefault();
+  const form = e.target;
+  const autor = form.autor.value.trim();
+  const texto = form.texto.value.trim();
+  if (!autor || !texto) return;
+  if (db){ await db.from('comentarios').insert({perfil_id:activePerfil.id, autor, texto}); }
+  else { DEMO.comentarios[activePerfil.id] = DEMO.comentarios[activePerfil.id] || []; DEMO.comentarios[activePerfil.id].push({autor, texto}); }
+  form.reset(); loadComentarios();
+}
+
+async function loadTips(){
+  let items = [];
+  if (db){
+    const { data } = await db.from('tips').select('*').eq('perfil_id', activePerfil.id).order('created_at');
+    items = data || [];
+  } else { items = DEMO.tips[activePerfil.id] || []; }
+  renderTips(items);
+}
+function renderTips(items){
+  const el = document.getElementById('tipsList');
+  el.innerHTML = items.length ? items.map(t=>`<div class="tip-item">${t.texto}</div>`).join('') : '<p class="empty-note">Sin tips todavía.</p>';
+}
+async function onAddTip(e){
+  e.preventDefault();
+  const form = e.target;
+  const texto = form.texto.value.trim();
+  if (!texto) return;
+  if (db){ await db.from('tips').insert({perfil_id:activePerfil.id, texto}); }
+  else { DEMO.tips[activePerfil.id] = DEMO.tips[activePerfil.id] || []; DEMO.tips[activePerfil.id].push({texto}); }
+  form.reset(); loadTips();
+}
+
+loadPerfiles();
+</script>
+</body>
+</html>
