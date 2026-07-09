@@ -434,8 +434,6 @@
     width:140px; font-size:.8rem; padding:7px 10px; border:1.5px solid var(--line); border-radius:8px;
     font-family:inherit; margin-bottom:8px; background:var(--white);
   }
-  .chat-as{font-size:.78rem; color:var(--ink-soft); margin-bottom:8px;}
-  .chat-as b{color:var(--ink);}
   .chat-compose-row{display:flex; gap:8px; align-items:center;}
   .chat-attach-btn{
     border:1.5px solid var(--line); background:var(--white); border-radius:10px; width:38px; height:38px;
@@ -565,7 +563,6 @@
       <div class="chat-wrap card-surface">
         <div class="chat-messages" id="chatMessages"></div>
         <form class="chat-compose" id="chatForm">
-          <div class="chat-as">Enviando como <b id="chatAutorLabel">—</b></div>
           <div class="chat-compose-row">
             <button type="button" class="chat-attach-btn" id="chatAttachBtn" title="Adjuntar foto, PDF o .md">📎</button>
             <input type="file" id="chatImageInput" accept="image/*,.pdf,application/pdf,.md,text/markdown" style="display:none;">
@@ -628,8 +625,6 @@ async function loadUsuariosNombre(){
   USUARIOS_DB = {};
   (data || []).forEach(row => { USUARIOS_DB[row.email] = row.nombre; });
   actualizarUserBadge();
-  const label = document.getElementById('chatAutorLabel');
-  if (label) label.textContent = nombreDeUsuario(currentUserEmail) || 'Invitado';
 }
 
 function actualizarUserBadge(){
@@ -1993,7 +1988,6 @@ function iconoParaExt(ext){
   return '📎';
 }
 
-document.getElementById('chatAutorLabel').textContent = nombreDeUsuario(currentUserEmail) || 'Invitado';
 chatAutor = nombreDeUsuario(currentUserEmail) || 'Invitado';
 
 document.getElementById('chatAttachBtn').addEventListener('click', ()=>{
