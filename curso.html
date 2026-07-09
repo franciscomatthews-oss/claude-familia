@@ -97,6 +97,10 @@
   .nav-item.active{background:var(--ink); color:var(--white);}
   .nav-item:hover:not(.active){color:var(--ink);}
   .nav-right{display:flex; align-items:center; gap:10px;}
+  .user-badge{
+    display:flex; align-items:center; gap:6px; background:var(--lime); color:var(--lime-ink);
+    font-size:.78rem; font-weight:800; padding:8px 14px; border-radius:99px;
+  }
   .cta-pill{
     display:flex; align-items:center; gap:8px;
     border:1.5px solid var(--ink); background:transparent; color:var(--ink);
@@ -411,6 +415,12 @@
   .chat-msg .hora{font-size:.72rem; color:var(--ink-soft);}
   .chat-msg .edited{font-size:.7rem; color:var(--ink-soft); font-style:italic;}
   .chat-msg img{max-width:220px; border-radius:12px; display:block; margin-top:6px; cursor:pointer;}
+  .chat-file-chip{
+    display:inline-flex; align-items:center; gap:6px; margin-top:6px; padding:8px 12px;
+    background:var(--white); border-radius:10px; font-size:.82rem; font-weight:700; color:var(--ink);
+    text-decoration:none; border:1px solid var(--line);
+  }
+  .chat-file-chip:hover{border-color:var(--ink);}
   .chat-msg-actions{display:flex; gap:8px; margin-top:4px;}
   .chat-msg-actions button{
     border:none; background:none; color:var(--ink-soft); font-size:.72rem; cursor:pointer; padding:0;
@@ -480,6 +490,7 @@
       <button class="nav-item" data-view="chat">Chat</button>
     </nav>
     <div class="nav-right">
+      <span class="user-badge" id="userBadge" style="display:none;"></span>
       <button class="cta-pill" data-goto="proyecto">Mi Proyecto <span>→</span></button>
       <button class="icon-circle" id="logoutBtn" title="Cerrar sesión">⏻</button>
     </div>
@@ -557,8 +568,8 @@
         <form class="chat-compose" id="chatForm">
           <input type="text" id="chatAutorInput" class="chat-autor-input" placeholder="Tu nombre" required>
           <div class="chat-compose-row">
-            <button type="button" class="chat-attach-btn" id="chatAttachBtn" title="Adjuntar foto">📎</button>
-            <input type="file" id="chatImageInput" accept="image/*" style="display:none;">
+            <button type="button" class="chat-attach-btn" id="chatAttachBtn" title="Adjuntar foto, PDF o .md">📎</button>
+            <input type="file" id="chatImageInput" accept="image/*,.pdf,application/pdf,.md,text/markdown" style="display:none;">
             <input type="text" id="chatTextInput" class="chat-text-input" placeholder="Escribe un mensaje...">
             <button type="submit" class="small-btn">Enviar</button>
           </div>
@@ -592,6 +603,26 @@ const ADMIN_EMAIL = "fmatthews001@gmail.com";
 let isAdmin = false;
 let currentUserEmail = null;
 
+// Mapa de correo → nombre de usuario. El admin ya está cargado.
+// A medida que cada integrante tenga su propia cuenta, agrégalos acá:
+// "correo@ejemplo.com": "Nombre",
+const USUARIOS_NOMBRE = {
+  "fmatthews001@gmail.com": "Francisco",
+};
+
+function nombreDeUsuario(email){
+  if (!email) return '';
+  return USUARIOS_NOMBRE[email] || email.split('@')[0];
+}
+
+function actualizarUserBadge(){
+  const badge = document.getElementById('userBadge');
+  if (!currentUserEmail && !isAdmin){ badge.style.display = 'none'; return; }
+  const nombre = currentUserEmail ? nombreDeUsuario(currentUserEmail) : 'Invitado';
+  badge.textContent = `👋 ${nombre}${isAdmin ? ' · Admin' : ''}`;
+  badge.style.display = 'flex';
+}
+
 document.getElementById('yearNow').textContent = new Date().getFullYear();
 
 /* ---------------- login / autenticación ---------------- */
@@ -615,6 +646,7 @@ async function checkAuth(){
     // modo demo sin Supabase conectado: no hay login que exigir, y activamos modo admin para poder ver/probar la edición
     document.getElementById('loginNote').textContent = 'Sitio en modo demo (sin Supabase conectado) — entrando directo, sin pedir clave.';
     isAdmin = true;
+    actualizarUserBadge();
     showApp();
     return;
   }
@@ -622,6 +654,7 @@ async function checkAuth(){
   if (session){
     currentUserEmail = session.user.email;
     isAdmin = currentUserEmail === ADMIN_EMAIL;
+    actualizarUserBadge();
     showApp();
   } else {
     showLogin();
@@ -643,6 +676,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
   form.reset();
   currentUserEmail = email;
   isAdmin = currentUserEmail === ADMIN_EMAIL;
+  actualizarUserBadge();
   showApp();
 });
 
@@ -658,6 +692,7 @@ if (db){
     if (session){
       currentUserEmail = session.user.email;
       isAdmin = currentUserEmail === ADMIN_EMAIL;
+      actualizarUserBadge();
       showApp();
     } else {
       showLogin();
@@ -1840,8 +1875,20 @@ loadTareas();
 
 /* ---------------- CHAT ---------------- */
 let chatAutor = '';
-let chatImageFile = null;
+let chatArchivo = null;
 let DEMO_CHAT = [];
+
+function extensionDe(nombre){
+  return (nombre || '').split('.').pop().toLowerCase();
+}
+function esImagenExt(ext){
+  return ['jpg','jpeg','png','gif','webp'].includes(ext);
+}
+function iconoParaExt(ext){
+  if (ext === 'pdf') return '📄';
+  if (ext === 'md') return '📝';
+  return '📎';
+}
 
 document.getElementById('chatAutorInput').addEventListener('change', (e)=>{ chatAutor = e.target.value.trim(); });
 
@@ -1849,14 +1896,19 @@ document.getElementById('chatAttachBtn').addEventListener('click', ()=>{
   document.getElementById('chatImageInput').click();
 });
 document.getElementById('chatImageInput').addEventListener('change', (e)=>{
-  chatImageFile = e.target.files[0] || null;
+  chatArchivo = e.target.files[0] || null;
   const preview = document.getElementById('chatImgPreview');
-  if (chatImageFile){
-    const url = URL.createObjectURL(chatImageFile);
+  if (chatArchivo){
+    const url = URL.createObjectURL(chatArchivo);
+    const ext = extensionDe(chatArchivo.name);
     preview.style.display = 'flex';
-    preview.innerHTML = `<img src="${url}"><button type="button" id="chatCancelImg">Quitar foto</button>`;
+    if (esImagenExt(ext)){
+      preview.innerHTML = `<img src="${url}"><button type="button" id="chatCancelImg">Quitar</button>`;
+    } else {
+      preview.innerHTML = `<span>${iconoParaExt(ext)} ${chatArchivo.name}</span><button type="button" id="chatCancelImg">Quitar</button>`;
+    }
     document.getElementById('chatCancelImg').addEventListener('click', ()=>{
-      chatImageFile = null; document.getElementById('chatImageInput').value = '';
+      chatArchivo = null; document.getElementById('chatImageInput').value = '';
       preview.style.display = 'none'; preview.innerHTML = '';
     });
   }
@@ -1867,26 +1919,29 @@ document.getElementById('chatForm').addEventListener('submit', async (e)=>{
   chatAutor = document.getElementById('chatAutorInput').value.trim();
   const textInput = document.getElementById('chatTextInput');
   const texto = textInput.value.trim();
-  if (!chatAutor || (!texto && !chatImageFile)) return;
+  if (!chatAutor || (!texto && !chatArchivo)) return;
 
-  let imagenUrl = null;
-  if (chatImageFile && db){
-    const path = `chat/${Date.now()}-${chatImageFile.name}`;
-    await db.storage.from(STORAGE_BUCKET).upload(path, chatImageFile, {upsert:true}).catch(()=>{});
+  let archivoUrl = null;
+  let nombreArchivo = null;
+  if (chatArchivo && db){
+    const path = `chat/${Date.now()}-${chatArchivo.name}`;
+    await db.storage.from(STORAGE_BUCKET).upload(path, chatArchivo, {upsert:true}).catch(()=>{});
     const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-    imagenUrl = pub ? pub.publicUrl : null;
-  } else if (chatImageFile && !db){
-    imagenUrl = URL.createObjectURL(chatImageFile);
+    archivoUrl = pub ? pub.publicUrl : null;
+    nombreArchivo = chatArchivo.name;
+  } else if (chatArchivo && !db){
+    archivoUrl = URL.createObjectURL(chatArchivo);
+    nombreArchivo = chatArchivo.name;
   }
 
   if (db){
-    await db.from('mensajes_chat').insert({ autor: chatAutor, texto: texto || null, imagen_url: imagenUrl });
+    await db.from('mensajes_chat').insert({ autor: chatAutor, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo });
   } else {
-    DEMO_CHAT.push({ id:'demo-'+Date.now(), autor: chatAutor, texto: texto || null, imagen_url: imagenUrl, created_at: new Date().toISOString(), updated_at: null });
+    DEMO_CHAT.push({ id:'demo-'+Date.now(), autor: chatAutor, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo, created_at: new Date().toISOString(), updated_at: null });
   }
 
   textInput.value = '';
-  chatImageFile = null;
+  chatArchivo = null;
   document.getElementById('chatImageInput').value = '';
   document.getElementById('chatImgPreview').style.display = 'none';
   document.getElementById('chatImgPreview').innerHTML = '';
@@ -1911,6 +1966,15 @@ function formatHora(iso){
   }catch(e){ return ''; }
 }
 
+function renderAdjuntoChat(m){
+  if (!m.imagen_url) return '';
+  const ext = extensionDe(m.nombre_archivo || m.imagen_url);
+  if (esImagenExt(ext)){
+    return `<img src="${m.imagen_url}" alt="foto" onclick="window.open('${m.imagen_url}','_blank')">`;
+  }
+  return `<a class="chat-file-chip" href="${m.imagen_url}" target="_blank">${iconoParaExt(ext)} ${m.nombre_archivo || 'archivo'}</a>`;
+}
+
 function renderMensajes(items){
   const el = document.getElementById('chatMessages');
   const wasNearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 60;
@@ -1919,7 +1983,7 @@ function renderMensajes(items){
       <div class="meta"><span class="autor">${m.autor}</span><span class="hora">${formatHora(m.created_at)}</span>${m.updated_at ? '<span class="edited">(editado)</span>' : ''}</div>
       <div class="bubble">
         ${m.texto ? `<div class="msg-text">${m.texto}</div>` : ''}
-        ${m.imagen_url ? `<img src="${m.imagen_url}" alt="foto" onclick="window.open('${m.imagen_url}','_blank')">` : ''}
+        ${renderAdjuntoChat(m)}
       </div>
       <div class="chat-msg-actions">
         ${m.texto ? `<button data-edit="${m.id}">Editar</button>` : ''}
