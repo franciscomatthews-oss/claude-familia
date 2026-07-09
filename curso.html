@@ -557,7 +557,7 @@
     <section id="view-chat" class="view">
       <div class="section-head">
         <h2>💬 Chat de la familia</h2>
-        <p>Un solo chat para todos — escriban, adjunten fotos, editen o borren lo que necesiten.</p>
+        <p>Por acá podemos hablar de lo que sea: noticias de IA, preguntas de los proyectos, avances, lo que quieran.</p>
       </div>
 
       <div class="chat-wrap card-surface">
@@ -2032,7 +2032,7 @@ document.getElementById('chatForm').addEventListener('submit', async (e)=>{
   }
 
   if (db){
-    await db.from('mensajes_chat').insert({ autor: chatAutor, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo });
+    await db.from('mensajes_chat').insert({ autor: chatAutor, autor_email: currentUserEmail, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo });
   } else {
     DEMO_CHAT.push({ id:'demo-'+Date.now(), autor: chatAutor, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo, created_at: new Date().toISOString(), updated_at: null });
   }
@@ -2075,19 +2075,23 @@ function renderAdjuntoChat(m){
 function renderMensajes(items){
   const el = document.getElementById('chatMessages');
   const wasNearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 60;
-  el.innerHTML = items.length ? items.map(m => `
+  const miNombre = nombreDeUsuario(currentUserEmail);
+  el.innerHTML = items.length ? items.map(m => {
+    const esMio = miNombre && m.autor === miNombre;
+    return `
     <div class="chat-msg" data-id="${m.id}">
       <div class="meta"><span class="autor">${m.autor}</span><span class="hora">${formatHora(m.created_at)}</span>${m.updated_at ? '<span class="edited">(editado)</span>' : ''}</div>
       <div class="bubble">
         ${m.texto ? `<div class="msg-text">${m.texto}</div>` : ''}
         ${renderAdjuntoChat(m)}
       </div>
+      ${esMio ? `
       <div class="chat-msg-actions">
         ${m.texto ? `<button data-edit="${m.id}">Editar</button>` : ''}
         <button data-del="${m.id}">Eliminar</button>
-      </div>
+      </div>` : ''}
     </div>
-  `).join('') : '<p class="empty-note">Todavía no hay mensajes. ¡Escribe el primero!</p>';
+  `; }).join('') : '<p class="empty-note">Todavía no hay mensajes. ¡Escribe el primero!</p>';
 
   el.querySelectorAll('[data-del]').forEach(btn=>{
     btn.addEventListener('click', ()=> deleteMensaje(btn.dataset.del));
