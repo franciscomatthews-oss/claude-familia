@@ -434,6 +434,8 @@
     width:140px; font-size:.8rem; padding:7px 10px; border:1.5px solid var(--line); border-radius:8px;
     font-family:inherit; margin-bottom:8px; background:var(--white);
   }
+  .chat-as{font-size:.78rem; color:var(--ink-soft); margin-bottom:8px;}
+  .chat-as b{color:var(--ink);}
   .chat-compose-row{display:flex; gap:8px; align-items:center;}
   .chat-attach-btn{
     border:1.5px solid var(--line); background:var(--white); border-radius:10px; width:38px; height:38px;
@@ -491,6 +493,7 @@
     </nav>
     <div class="nav-right">
       <span class="user-badge" id="userBadge" style="display:none;"></span>
+      <button class="icon-circle" id="usersBtn" title="Editar nombres de usuarios" style="display:none;">👥</button>
       <button class="cta-pill" data-goto="proyecto">Mi Proyecto <span>→</span></button>
       <button class="icon-circle" id="logoutBtn" title="Cerrar sesión">⏻</button>
     </div>
@@ -540,10 +543,6 @@
       <div class="perfiles-grid" id="perfilesGrid"></div>
 
       <div class="proyecto-detail" id="proyectoDetail"></div>
-
-      <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-box" id="modalBox"></div>
-      </div>
     </section>
 
     <!-- ============ TAREAS ============ -->
@@ -566,7 +565,7 @@
       <div class="chat-wrap card-surface">
         <div class="chat-messages" id="chatMessages"></div>
         <form class="chat-compose" id="chatForm">
-          <input type="text" id="chatAutorInput" class="chat-autor-input" placeholder="Tu nombre" required>
+          <div class="chat-as">Enviando como <b id="chatAutorLabel">—</b></div>
           <div class="chat-compose-row">
             <button type="button" class="chat-attach-btn" id="chatAttachBtn" title="Adjuntar foto, PDF o .md">📎</button>
             <input type="file" id="chatImageInput" accept="image/*,.pdf,application/pdf,.md,text/markdown" style="display:none;">
@@ -579,6 +578,11 @@
     </section>
 
   </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox"></div>
+  </div>
+
 
   <footer>Hecho en familia, con Claude. · <span id="yearNow"></span></footer>
 </div>
@@ -603,20 +607,35 @@ const ADMIN_EMAIL = "fmatthews001@gmail.com";
 let isAdmin = false;
 let currentUserEmail = null;
 
-// Mapa de correo → nombre de usuario. El admin ya está cargado.
-// A medida que cada integrante tenga su propia cuenta, agrégalos acá:
-// "correo@ejemplo.com": "Nombre",
+// Mapa de correo → nombre de usuario, de respaldo (el admin ya está cargado).
+// Los nombres editados desde el sitio (botón 👥) se guardan en Supabase y
+// tienen prioridad sobre este mapa.
 const USUARIOS_NOMBRE = {
   "fmatthews001@gmail.com": "Francisco",
 };
 
+// Se llena al cargar el sitio, desde la tabla usuarios_nombre en Supabase.
+let USUARIOS_DB = {};
+
 function nombreDeUsuario(email){
   if (!email) return '';
-  return USUARIOS_NOMBRE[email] || email.split('@')[0];
+  return USUARIOS_DB[email] || USUARIOS_NOMBRE[email] || email.split('@')[0];
+}
+
+async function loadUsuariosNombre(){
+  if (!db) return;
+  const { data } = await db.from('usuarios_nombre').select('*');
+  USUARIOS_DB = {};
+  (data || []).forEach(row => { USUARIOS_DB[row.email] = row.nombre; });
+  actualizarUserBadge();
+  const label = document.getElementById('chatAutorLabel');
+  if (label) label.textContent = nombreDeUsuario(currentUserEmail) || 'Invitado';
 }
 
 function actualizarUserBadge(){
   const badge = document.getElementById('userBadge');
+  const usersBtn = document.getElementById('usersBtn');
+  if (usersBtn) usersBtn.style.display = isAdmin ? 'flex' : 'none';
   if (!currentUserEmail && !isAdmin){ badge.style.display = 'none'; return; }
   const nombre = currentUserEmail ? nombreDeUsuario(currentUserEmail) : 'Invitado';
   badge.textContent = `👋 ${nombre}${isAdmin ? ' · Admin' : ''}`;
@@ -704,6 +723,8 @@ checkAuth();
 
 /* ---------------- todo lo demás arranca recién tras el login ---------------- */
 function initApp(){
+
+loadUsuariosNombre();
 
 /* ---------------- navegación entre vistas ---------------- */
 function goto(view){
@@ -1428,6 +1449,88 @@ document.getElementById('modalOverlay').addEventListener('click', (e)=>{
   if (e.target.id === 'modalOverlay') closeModal();
 });
 
+/* ---------------- panel de admin: nombres de usuarios ---------------- */
+const usersBtnEl = document.getElementById('usersBtn');
+if (usersBtnEl) usersBtnEl.addEventListener('click', renderUsuariosModal);
+
+async function renderUsuariosModal(){
+  if (!isAdmin) return;
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <h3>👥 Nombres de usuarios</h3>
+    <p class="empty-note" style="margin-top:-10px; margin-bottom:14px;">Así se muestra cada correo en el chat y en el resto del sitio. Tu propio correo queda fijo en "Francisco".</p>
+    <div id="usuariosList"></div>
+    <form id="usuarioForm" class="comment-form" style="margin-top:14px;">
+      <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+      <input type="text" name="nombre" placeholder="Nombre a mostrar" required>
+      <button class="small-btn" type="submit">Agregar / actualizar</button>
+    </form>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('usuarioForm').addEventListener('submit', onGuardarUsuario);
+  await renderUsuariosList();
+}
+
+async function renderUsuariosList(){
+  const el = document.getElementById('usuariosList');
+  if (!db){
+    el.innerHTML = '<p class="empty-note">Conecta Supabase para poder guardar estos cambios (por ahora estás en modo demo).</p>';
+    return;
+  }
+  const { data } = await db.from('usuarios_nombre').select('*').order('nombre');
+  const filas = data || [];
+  // Asegura que el admin siempre aparezca en la lista, aunque no tenga fila en la tabla todavía.
+  if (!filas.find(f => f.email === ADMIN_EMAIL)){
+    filas.unshift({email: ADMIN_EMAIL, nombre: 'Francisco'});
+  }
+  el.innerHTML = filas.map(f=>{
+    const esAdmin = f.email === ADMIN_EMAIL;
+    return `
+      <div class="comment" style="align-items:center;">
+        <div style="flex:1;">
+          <div class="empty-note" style="margin-bottom:2px;">${f.email}${esAdmin ? ' · admin' : ''}</div>
+          ${esAdmin
+            ? `<b>Francisco</b>`
+            : `<input type="text" class="edit-nombre-input" data-email="${f.email}" value="${f.nombre}" style="font-size:.88rem; padding:6px 8px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; width:160px;">`
+          }
+        </div>
+        ${esAdmin ? '' : `<button class="small-btn" data-save="${f.email}" style="padding:6px 12px;">Guardar</button>`}
+      </div>`;
+  }).join('');
+  el.querySelectorAll('[data-save]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const email = btn.dataset.save;
+      const input = el.querySelector(`.edit-nombre-input[data-email="${email}"]`);
+      const nombre = input.value.trim();
+      if (!nombre) return;
+      await db.from('usuarios_nombre').upsert({email, nombre});
+      btn.textContent = '¡Guardado!';
+      setTimeout(()=> btn.textContent = 'Guardar', 1200);
+      await loadUsuariosNombre();
+    });
+  });
+}
+
+async function onGuardarUsuario(e){
+  e.preventDefault();
+  const form = e.target;
+  const email = form.email.value.trim().toLowerCase();
+  const nombre = form.nombre.value.trim();
+  if (!email || !nombre) return;
+  if (email === ADMIN_EMAIL){
+    alert('Ese es tu correo de admin — queda fijo como "Francisco".');
+    return;
+  }
+  if (db){
+    await db.from('usuarios_nombre').upsert({email, nombre});
+    await loadUsuariosNombre();
+  }
+  form.reset();
+  renderUsuariosList();
+}
+
 function renderIdeaModal(){
   const box = document.getElementById('modalBox');
   box.innerHTML = `
@@ -1890,7 +1993,8 @@ function iconoParaExt(ext){
   return '📎';
 }
 
-document.getElementById('chatAutorInput').addEventListener('change', (e)=>{ chatAutor = e.target.value.trim(); });
+document.getElementById('chatAutorLabel').textContent = nombreDeUsuario(currentUserEmail) || 'Invitado';
+chatAutor = nombreDeUsuario(currentUserEmail) || 'Invitado';
 
 document.getElementById('chatAttachBtn').addEventListener('click', ()=>{
   document.getElementById('chatImageInput').click();
@@ -1916,7 +2020,6 @@ document.getElementById('chatImageInput').addEventListener('change', (e)=>{
 
 document.getElementById('chatForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
-  chatAutor = document.getElementById('chatAutorInput').value.trim();
   const textInput = document.getElementById('chatTextInput');
   const texto = textInput.value.trim();
   if (!chatAutor || (!texto && !chatArchivo)) return;
