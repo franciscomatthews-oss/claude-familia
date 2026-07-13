@@ -405,6 +405,16 @@
 
   /* ---------------- chat ---------------- */
   .chat-wrap{display:flex; flex-direction:column; height:min(640px, 70vh); overflow:hidden;}
+  .chat-wrap.mini{
+    height:min(420px, 58vh); border-radius:16px; border:1.5px solid var(--line); box-shadow:none;
+  }
+  .chat-wrap.mini .chat-messages{padding:16px; gap:10px;}
+  .chat-wrap.mini .chat-compose{padding:10px 14px;}
+  .chat-wrap.mini .pdf-preview{height:180px;}
+  .privado-locked{
+    padding:26px 16px; text-align:center; color:var(--ink-soft); font-size:.88rem;
+    background:var(--cream); border-radius:16px;
+  }
   .chat-messages{flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:14px;}
   .chat-msg{max-width:78%; align-self:flex-start;}
   .chat-msg .bubble{
@@ -421,6 +431,17 @@
     text-decoration:none; border:1px solid var(--line);
   }
   .chat-file-chip:hover{border-color:var(--ink);}
+  .chat-file-chip-group{display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-top:6px;}
+  .chat-file-chip-group .chat-file-chip{margin-top:0;}
+  .chat-file-download{
+    text-decoration:none; font-size:.8rem; background:var(--white); border:1px solid var(--line);
+    border-radius:8px; padding:4px 9px;
+  }
+  .chat-file-download:hover{border-color:var(--ink);}
+  .pdf-preview{
+    width:100%; height:260px; border-radius:10px; border:1px solid var(--line); margin-top:2px; background:var(--white);
+  }
+  .pdf-preview-chat{height:200px; max-width:260px;}
   .chat-msg-actions{display:flex; gap:8px; margin-top:4px;}
   .chat-msg-actions button{
     border:none; background:none; color:var(--ink-soft); font-size:.72rem; cursor:pointer; padding:0;
@@ -1405,7 +1426,11 @@ async function handlePdf(file){
   if (!file) return;
   if (db){
     const path = `${activePerfil.id}/pdf-${Date.now()}-${file.name}`;
-    await db.storage.from(STORAGE_BUCKET).upload(path, file, {upsert:true}).catch(()=>{});
+    const { error } = await db.storage.from(STORAGE_BUCKET).upload(path, file, {upsert:true});
+    if (error){
+      alert(`No se pudo subir el PDF: ${error.message}`);
+      return;
+    }
     const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     await db.from('proyectos_pdf').insert({perfil_id:activePerfil.id, nombre_archivo:file.name, storage_path:path, url:pub ? pub.publicUrl : null});
   } else {
@@ -1422,7 +1447,13 @@ async function loadPdfs(){
   } else { items = DEMO.pdfs[activePerfil.id] || []; }
   const el = document.getElementById('pdfList');
   el.innerHTML = items.length ? items.map(p=>`
-    <div class="comment">📄 ${p.url ? `<a href="${p.url}" target="_blank">${p.nombre_archivo}</a>` : p.nombre_archivo}</div>
+    <div class="comment" style="flex-direction:column; align-items:stretch;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <span>📄 ${p.nombre_archivo}</span>
+        ${p.url ? `<span style="display:flex; gap:10px; flex-shrink:0;"><a href="${p.url}" target="_blank">Ver</a><a href="${p.url}" download="${p.nombre_archivo}">Descargar</a></span>` : ''}
+      </div>
+      ${p.url ? `<embed src="${p.url}#toolbar=0" type="application/pdf" class="pdf-preview">` : ''}
+    </div>
   `).join('') : '<p class="empty-note">Sin PDFs todavía.</p>';
 }
 
@@ -1439,6 +1470,11 @@ function openSquareModal(key){
 }
 function closeModal(){
   document.getElementById('modalOverlay').classList.remove('show');
+  if (privChatChannel){
+    db.removeChannel(privChatChannel);
+    privChatChannel = null;
+  }
+  privChatArchivo = null;
 }
 document.getElementById('modalOverlay').addEventListener('click', (e)=>{
   if (e.target.id === 'modalOverlay') closeModal();
@@ -1600,25 +1636,193 @@ function renderRepositoriosModal(){
   document.getElementById('modalForm').addEventListener('submit', (e)=> onAddModalLink(e,'repositorios','repositorios'));
 }
 
+/* ---- chat privado: admin <-> titular del perfil, estilo mini-chat ---- */
+let privChatArchivo = null;
+let privChatChannel = null;
+let DEMO_CHAT_PRIVADO = {};
+
+function emailDelTitular(nombre){
+  return Object.keys(USUARIOS_DB).find(email => USUARIOS_DB[email] === nombre) || null;
+}
+
+function puedeUsarChatPrivado(){
+  if (isAdmin) return true;
+  const miNombre = nombreDeUsuario(currentUserEmail);
+  return !!miNombre && miNombre === activePerfil.nombre;
+}
+
 function renderChatPrivadoModal(){
   const box = document.getElementById('modalBox');
+  const autorizado = puedeUsarChatPrivado();
   box.innerHTML = `
     <button class="modal-close" id="modalCloseBtn">✕</button>
     <h3>💬 Chat privado — ${activePerfil.nombre}</h3>
-    <p class="empty-note" style="margin-top:-10px; margin-bottom:12px;">Solo entre el admin y el dueño de este perfil.</p>
-    <div id="modalList"></div>
-    <form id="modalForm" class="comment-form">
-      ${autorFieldHtml()}
-      <input type="text" name="texto" placeholder="Escribe un mensaje..." required>
-      <button class="small-btn" type="submit">Enviar</button>
-    </form>
+    <p class="empty-note" style="margin-top:-10px; margin-bottom:12px;">Solo entre Francisco y ${activePerfil.nombre}.</p>
+    ${autorizado ? `
+    <div class="chat-wrap mini">
+      <div class="chat-messages" id="privChatMessages"></div>
+      <form class="chat-compose" id="privChatForm">
+        <div class="chat-compose-row">
+          <button type="button" class="chat-attach-btn" id="privChatAttachBtn" title="Adjuntar foto, PDF o .md">📎</button>
+          <input type="file" id="privChatFileInput" accept="image/*,.pdf,application/pdf,.md,text/markdown" style="display:none;">
+          <input type="text" id="privChatTextInput" class="chat-text-input" placeholder="Escribe un mensaje...">
+          <button type="submit" class="small-btn">Enviar</button>
+        </div>
+        <div class="chat-preview" id="privChatImgPreview" style="display:none;"></div>
+      </form>
+    </div>` : `
+    <div class="privado-locked">Este chat es privado entre Francisco y ${activePerfil.nombre}. No tienes acceso a esta conversación.</div>
+    `}
   `;
   document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
-  loadModalItems('chat');
-  document.getElementById('modalForm').addEventListener('submit', (e)=> onAddModalItem(e,'chat'));
+  if (!autorizado) return;
+
+  document.getElementById('privChatAttachBtn').addEventListener('click', ()=>{
+    document.getElementById('privChatFileInput').click();
+  });
+  document.getElementById('privChatFileInput').addEventListener('change', (e)=>{
+    privChatArchivo = e.target.files[0] || null;
+    const preview = document.getElementById('privChatImgPreview');
+    if (privChatArchivo){
+      const url = URL.createObjectURL(privChatArchivo);
+      const ext = extensionDe(privChatArchivo.name);
+      preview.style.display = 'flex';
+      if (esImagenExt(ext)){
+        preview.innerHTML = `<img src="${url}"><button type="button" id="privChatCancelImg">Quitar</button>`;
+      } else {
+        preview.innerHTML = `<span>${iconoParaExt(ext)} ${privChatArchivo.name}</span><button type="button" id="privChatCancelImg">Quitar</button>`;
+      }
+      document.getElementById('privChatCancelImg').addEventListener('click', ()=>{
+        privChatArchivo = null; document.getElementById('privChatFileInput').value = '';
+        preview.style.display = 'none'; preview.innerHTML = '';
+      });
+    }
+  });
+  document.getElementById('privChatForm').addEventListener('submit', enviarMensajePrivado);
+
+  loadMensajesPrivados();
+
+  if (db){
+    privChatChannel = db.channel(`chat_privado-${activePerfil.id}`)
+      .on('postgres_changes', { event:'*', schema:'public', table:'chat_privado', filter:`perfil_id=eq.${activePerfil.id}` }, () => loadMensajesPrivados())
+      .subscribe();
+  }
 }
 
-const MODAL_TABLES = { preguntas:'dudas', referentes:'links_interesantes', repositorios:'repositorios', chat:'chat_privado' };
+async function enviarMensajePrivado(e){
+  e.preventDefault();
+  const textInput = document.getElementById('privChatTextInput');
+  const texto = textInput.value.trim();
+  if (!texto && !privChatArchivo) return;
+
+  const autor = isAdmin ? 'Francisco' : (nombreDeUsuario(currentUserEmail) || activePerfil.nombre);
+
+  let archivoUrl = null;
+  let nombreArchivo = null;
+  if (privChatArchivo && db){
+    const path = `privado/${activePerfil.id}/${Date.now()}-${privChatArchivo.name}`;
+    const { error } = await db.storage.from(STORAGE_BUCKET).upload(path, privChatArchivo, {upsert:true});
+    if (error){
+      alert(`No se pudo subir el archivo: ${error.message}`);
+      return;
+    }
+    const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    archivoUrl = pub ? pub.publicUrl : null;
+    nombreArchivo = privChatArchivo.name;
+  } else if (privChatArchivo && !db){
+    archivoUrl = URL.createObjectURL(privChatArchivo);
+    nombreArchivo = privChatArchivo.name;
+  }
+
+  if (db){
+    await db.from('chat_privado').insert({ perfil_id:activePerfil.id, autor, autor_email: currentUserEmail, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo });
+  } else {
+    DEMO_CHAT_PRIVADO[activePerfil.id] = DEMO_CHAT_PRIVADO[activePerfil.id] || [];
+    DEMO_CHAT_PRIVADO[activePerfil.id].push({ id:'demo-'+Date.now(), autor, autor_email: currentUserEmail, texto: texto || null, imagen_url: archivoUrl, nombre_archivo: nombreArchivo, created_at: new Date().toISOString(), updated_at: null });
+  }
+
+  textInput.value = '';
+  privChatArchivo = null;
+  document.getElementById('privChatFileInput').value = '';
+  document.getElementById('privChatImgPreview').style.display = 'none';
+  document.getElementById('privChatImgPreview').innerHTML = '';
+  loadMensajesPrivados();
+}
+
+async function loadMensajesPrivados(){
+  let items = [];
+  if (db){
+    const { data } = await db.from('chat_privado').select('*').eq('perfil_id', activePerfil.id).order('created_at');
+    items = data || [];
+  } else {
+    items = DEMO_CHAT_PRIVADO[activePerfil.id] || [];
+  }
+  renderMensajesPrivados(items);
+}
+
+function renderMensajesPrivados(items){
+  const el = document.getElementById('privChatMessages');
+  if (!el) return;
+  el.innerHTML = items.length ? items.map(m => {
+    const esMio = m.autor_email && m.autor_email === currentUserEmail;
+    return `
+    <div class="chat-msg" data-id="${m.id}">
+      <div class="meta"><span class="autor">${m.autor}</span><span class="hora">${formatHora(m.created_at)}</span>${m.updated_at ? '<span class="edited">(editado)</span>' : ''}</div>
+      <div class="bubble">
+        ${m.texto ? `<div class="msg-text">${m.texto}</div>` : ''}
+        ${renderAdjuntoChat(m)}
+      </div>
+      ${esMio ? `
+      <div class="chat-msg-actions">
+        ${m.texto ? `<button data-priv-edit="${m.id}">Editar</button>` : ''}
+        <button data-priv-del="${m.id}">Eliminar</button>
+      </div>` : ''}
+    </div>
+  `; }).join('') : '<p class="empty-note">Todavía no hay mensajes. ¡Escribe el primero!</p>';
+
+  el.querySelectorAll('[data-priv-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=> eliminarMensajePrivado(btn.dataset.privDel));
+  });
+  el.querySelectorAll('[data-priv-edit]').forEach(btn=>{
+    btn.addEventListener('click', ()=> editarMensajePrivado(btn.dataset.privEdit, items));
+  });
+  el.scrollTop = el.scrollHeight;
+}
+
+function editarMensajePrivado(id, items){
+  const msg = items.find(m => String(m.id) === String(id));
+  if (!msg) return;
+  const container = document.querySelector(`#privChatMessages .chat-msg[data-id="${id}"] .bubble`);
+  container.innerHTML = `
+    <div class="chat-edit-box">
+      <input type="text" id="privEditMsgInput" value="${(msg.texto||'').replace(/"/g,'&quot;')}">
+      <button class="small-btn" id="privEditMsgSave">Guardar</button>
+    </div>`;
+  document.getElementById('privEditMsgSave').addEventListener('click', ()=> guardarEdicionPrivada(id));
+}
+
+async function guardarEdicionPrivada(id){
+  const nuevoTexto = document.getElementById('privEditMsgInput').value.trim();
+  if (!nuevoTexto) return;
+  if (db){
+    await db.from('chat_privado').update({ texto: nuevoTexto, updated_at: new Date().toISOString() }).eq('id', id);
+  } else {
+    DEMO_CHAT_PRIVADO[activePerfil.id] = (DEMO_CHAT_PRIVADO[activePerfil.id]||[]).map(m => String(m.id)===String(id) ? {...m, texto:nuevoTexto, updated_at:new Date().toISOString()} : m);
+  }
+  loadMensajesPrivados();
+}
+
+async function eliminarMensajePrivado(id){
+  if (!confirm('¿Eliminar este mensaje?')) return;
+  if (db){
+    await db.from('chat_privado').delete().eq('id', id);
+  } else {
+    DEMO_CHAT_PRIVADO[activePerfil.id] = (DEMO_CHAT_PRIVADO[activePerfil.id]||[]).filter(m => String(m.id) !== String(id));
+  }
+  loadMensajesPrivados();
+}
+
+const MODAL_TABLES = { preguntas:'dudas', referentes:'links_interesantes', repositorios:'repositorios' };
 
 async function loadModalItems(tipo){
   let items = [];
@@ -1893,10 +2097,12 @@ function setupTareaDropzone(){
 
 async function handleTareaFiles(fileList){
   const files = Array.from(fileList);
+  const fallidos = [];
   for (const file of files){
     if (db){
       const path = `tareas/${activeTarea.id}/${Date.now()}-${file.name}`;
-      await db.storage.from(STORAGE_BUCKET).upload(path, file, {upsert:true}).catch(()=>{});
+      const { error } = await db.storage.from(STORAGE_BUCKET).upload(path, file, {upsert:true});
+      if (error){ fallidos.push(`${file.name}: ${error.message}`); continue; }
       const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
       await db.from('tareas_archivos').insert({tarea_id:activeTarea.id, nombre_archivo:file.name, url: pub ? pub.publicUrl : null, es_imagen: file.type.startsWith('image/')});
     } else {
@@ -1904,6 +2110,7 @@ async function handleTareaFiles(fileList){
       DEMO_TAREA_ARCHIVOS[activeTarea.id].push({id:'demo-'+Date.now()+Math.random(), nombre_archivo:file.name, url:URL.createObjectURL(file), es_imagen:file.type.startsWith('image/')});
     }
   }
+  if (fallidos.length) alert(`No se pudieron subir estos archivos:\n${fallidos.join('\n')}`);
   loadTareaArchivos();
 }
 
@@ -1916,14 +2123,21 @@ async function loadTareaArchivos(){
     items = DEMO_TAREA_ARCHIVOS[activeTarea.id] || [];
   }
   const el = document.getElementById('tareaArchivosList');
-  el.innerHTML = items.length ? items.map(a=>`
-    <div class="archivo-item">
-      <div>
-        📎 <a href="${a.url}" target="_blank">${a.nombre_archivo}</a>
-        ${a.es_imagen && a.url ? `<img src="${a.url}" alt="">` : ''}
+  el.innerHTML = items.length ? items.map(a=>{
+    const ext = extensionDe(a.nombre_archivo);
+    const esPdf = ext === 'pdf';
+    return `
+    <div class="archivo-item" style="flex-direction:column; align-items:stretch; gap:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <span>${esPdf ? '📄' : '📎'} ${a.nombre_archivo}</span>
+        <span style="display:flex; gap:10px; flex-shrink:0;">
+          ${a.url ? `<a href="${a.url}" target="_blank">Ver</a><a href="${a.url}" download="${a.nombre_archivo}">Descargar</a>` : ''}
+          ${isAdmin ? `<button class="comment-delete" data-id="${a.id}" title="Eliminar">✕</button>` : ''}
+        </span>
       </div>
-      ${isAdmin ? `<button class="comment-delete" data-id="${a.id}" title="Eliminar">✕</button>` : ''}
-    </div>`).join('') : '<p class="empty-note">Sin archivos todavía.</p>';
+      ${a.es_imagen && a.url ? `<img src="${a.url}" alt="">` : ''}
+      ${esPdf && a.url ? `<embed src="${a.url}#toolbar=0" type="application/pdf" class="pdf-preview">` : ''}
+    </div>`;}).join('') : '<p class="empty-note">Sin archivos todavía.</p>';
   if (isAdmin){
     el.querySelectorAll('.comment-delete').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
@@ -2022,7 +2236,11 @@ document.getElementById('chatForm').addEventListener('submit', async (e)=>{
   let nombreArchivo = null;
   if (chatArchivo && db){
     const path = `chat/${Date.now()}-${chatArchivo.name}`;
-    await db.storage.from(STORAGE_BUCKET).upload(path, chatArchivo, {upsert:true}).catch(()=>{});
+    const { error } = await db.storage.from(STORAGE_BUCKET).upload(path, chatArchivo, {upsert:true});
+    if (error){
+      alert(`No se pudo subir el archivo: ${error.message}`);
+      return;
+    }
     const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     archivoUrl = pub ? pub.publicUrl : null;
     nombreArchivo = chatArchivo.name;
@@ -2069,7 +2287,11 @@ function renderAdjuntoChat(m){
   if (esImagenExt(ext)){
     return `<img src="${m.imagen_url}" alt="foto" onclick="window.open('${m.imagen_url}','_blank')">`;
   }
-  return `<a class="chat-file-chip" href="${m.imagen_url}" target="_blank">${iconoParaExt(ext)} ${m.nombre_archivo || 'archivo'}</a>`;
+  return `<span class="chat-file-chip-group">
+    <a class="chat-file-chip" href="${m.imagen_url}" target="_blank">${iconoParaExt(ext)} ${m.nombre_archivo || 'archivo'}</a>
+    <a class="chat-file-download" href="${m.imagen_url}" download="${m.nombre_archivo || ''}" title="Descargar">⬇️</a>
+    ${ext === 'pdf' ? `<embed src="${m.imagen_url}#toolbar=0" type="application/pdf" class="pdf-preview pdf-preview-chat">` : ''}
+  </span>`;
 }
 
 function renderMensajes(items){
