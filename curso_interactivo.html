@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curso Familiar — Aprende Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F4EEE1;
+    --card: #FFFFFF;
+    --ink: #2B2620;
+    --ink-soft: #7A7166;
+    --line: #ECE4D4;
+    --lime: #B7CF3D;
+    --lime-soft: #EEF3D6;
+    --sky: #4FA8D8;
+    --sky-soft: #E1F0F8;
+    --lavender: #9C86D8;
+    --lavender-soft: #EBE6F8;
+    --teal: #2E9E92;
+    --teal-soft: #DDF2EF;
+    --gold: #DDA13A;
+    --gold-soft: #FBEED9;
+    --coral: #E2694A;
+    --coral-soft: #FBE3DC;
+    --rose: #C97B8E;
+    --rose-soft: #F5E3E8;
+    --olive: #8A9A4E;
+    --olive-soft: #ECEEDA;
+    --radius: 24px;
+  }
+  *{box-sizing:border-box;}
+  html{font-size:18px;}
+  body{
+    margin:0;
+    font-family:'Manrope',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:44px 28px 90px;
+  }
+  .shell{
+    max-width:1480px;
+    margin:0 auto;
+    background:var(--card);
+    border-radius:32px;
+    box-shadow:0 16px 56px rgba(43,38,32,0.10);
+    overflow:hidden;
+  }
+  header.top{
+    padding:48px 60px 36px;
+    border-bottom:1px solid var(--line);
+  }
+  header.top h1{
+    margin:0 0 8px;
+    font-size:44px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+  header.top p{
+    margin:0 0 24px;
+    color:var(--ink-soft);
+    font-size:21px;
+  }
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .progress-track{
+    flex:1;
+    height:14px;
+    border-radius:999px;
+    background:var(--line);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--teal), var(--lime));
+    border-radius:999px;
+    transition:width .4s ease;
+  }
+  .progress-label{
+    font-size:18px;
+    font-weight:700;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .layout{
+    display:flex;
+    align-items:stretch;
+    min-height:620px;
+  }
+  nav.sidebar{
+    width:400px;
+    flex-shrink:0;
+    padding:32px 24px;
+    border-right:1px solid var(--line);
+    overflow-y:auto;
+    max-height:80vh;
+  }
+  .module-block{margin-bottom:26px;}
+  .module-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:16px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    padding:11px 16px;
+    border-radius:12px;
+    margin-bottom:10px;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .subgroup-title{
+    font-size:15px;
+    font-weight:800;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin:16px 6px 8px;
+    padding-left:10px;
+    border-left:4px solid var(--line);
+    line-height:1.3;
+  }
+  .chapter-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    padding:14px 14px;
+    border-radius:14px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:18px;
+    line-height:1.3;
+    color:var(--ink);
+    margin-bottom:3px;
+  }
+  .chapter-btn:hover{background:var(--bg);}
+  .chapter-btn.active{background:var(--ink);color:#fff;}
+  .chapter-btn .num{
+    font-size:14px;
+    font-weight:800;
+    color:var(--ink-soft);
+    width:24px;
+    flex-shrink:0;
+  }
+  .chapter-btn.active .num{color:rgba(255,255,255,0.6);}
+  .check{
+    width:22px;height:22px;border-radius:50%;
+    border:2.5px solid var(--line);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .chapter-btn.done .check{background:var(--teal);border-color:var(--teal);}
+  .chapter-btn.done .check:after{content:"✓";color:#fff;font-size:13px;font-weight:800;}
+  .chapter-btn.active .check{border-color:rgba(255,255,255,0.5);}
+  .chapter-btn[disabled]{opacity:.45;cursor:default;}
+
+  main.content{
+    flex:1;
+    padding:56px 68px;
+    overflow-y:auto;
+    max-height:80vh;
+  }
+  .chapter-header{margin-bottom:30px;}
+  .chapter-eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:16px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    padding:8px 18px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+  .chapter-header h2{
+    margin:0;
+    font-size:46px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+  }
+  section.block{margin-bottom:30px;}
+  .block-label{
+    font-size:16px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .block p{margin:0 0 14px;line-height:1.65;font-size:22px;}
+  .block ul{margin:0 0 14px;padding-left:26px;line-height:1.65;font-size:22px;}
+  .card-def{
+    background:var(--bg);
+    border-radius:18px;
+    padding:24px 28px;
+  }
+  .example-box{
+    background:var(--sky-soft);
+    border-left:5px solid var(--sky);
+    border-radius:12px;
+    padding:18px 22px;
+    margin-bottom:14px;
+    font-size:20px;
+    line-height:1.5;
+  }
+  .pitfall-box{
+    background:var(--coral-soft);
+    border-left:5px solid var(--coral);
+    border-radius:12px;
+    padding:18px 22px;
+    font-size:20px;
+    line-height:1.5;
+  }
+  .exercise-box{
+    background:var(--lime-soft);
+    border:2.5px dashed var(--lime);
+    border-radius:18px;
+    padding:26px 28px;
+  }
+  .exercise-box p{margin:0 0 18px;font-size:22px;line-height:1.5;}
+  .complete-btn{
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:14px 26px;
+    border-radius:999px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:18px;
+    cursor:pointer;
+  }
+  .complete-btn.done{background:var(--teal);}
+  .placeholder{
+    background:var(--bg);
+    border-radius:18px;
+    padding:56px;
+    text-align:center;
+    font-size:20px;
+    color:var(--ink-soft);
+  }
+  .chapter-nav{
+    display:flex;
+    justify-content:space-between;
+    margin-top:38px;
+    padding-top:26px;
+    border-top:1px solid var(--line);
+  }
+  .nav-btn{
+    background:none;
+    border:2px solid var(--line);
+    padding:13px 22px;
+    border-radius:999px;
+    font-family:inherit;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .nav-btn:hover{border-color:var(--ink);}
+  .nav-btn[disabled]{opacity:.3;cursor:default;}
+  .chapter-header, section.block, .chapter-nav{max-width:900px;}
+  .class-mode-btn{
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:12px 24px;
+    border-radius:999px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .class-mode-btn:hover{opacity:.88;}
+
+  /* ---------- Modo Clase (presentación, una idea a la vez) ---------- */
+  .preso-view{display:none;flex-direction:column;min-height:640px;}
+  .preso-view.active{display:flex;}
+  .preso-topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 48px;border-bottom:1px solid var(--line);
+  }
+  .preso-info{
+    font-size:16px;font-weight:800;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+  .preso-exit-btn{
+    background:none;border:2px solid var(--line);padding:10px 22px;
+    border-radius:999px;font-family:inherit;font-weight:700;font-size:16px;
+    cursor:pointer;color:var(--ink);
+  }
+  .preso-exit-btn:hover{border-color:var(--ink);}
+  .preso-slide{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:40px 80px;
+  }
+  .preso-slide-inner{max-width:1020px;width:100%;}
+  .preso-label{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+    padding:10px 24px;border-radius:999px;margin-bottom:30px;
+  }
+  .preso-title-icon{font-size:76px;display:block;margin-bottom:18px;}
+  .preso-title-text{font-size:56px;font-weight:800;line-height:1.15;letter-spacing:-0.01em;}
+  .preso-body{font-size:32px;line-height:1.55;}
+  .preso-body.card{background:var(--bg);border-radius:24px;padding:36px 40px;}
+  .preso-complete-btn{margin-top:30px;font-size:20px;padding:16px 28px;}
+  .preso-nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:24px 48px;border-top:1px solid var(--line);
+  }
+  .preso-arrow-btn{
+    background:var(--ink);color:#fff;border:none;width:68px;height:68px;
+    border-radius:50%;font-size:28px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .preso-arrow-btn:disabled{opacity:.22;cursor:default;}
+  .preso-dots{font-size:17px;font-weight:700;color:var(--ink-soft);}
+  @media (max-width:900px){
+    .preso-slide{padding:28px 30px;}
+    .preso-title-icon{font-size:52px;}
+    .preso-title-text{font-size:36px;}
+    .preso-body{font-size:21px;}
+    .preso-topbar, .preso-nav{padding:16px 22px;}
+  }
+  @media (max-width:900px){
+    .layout{flex-direction:column;}
+    nav.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--line);max-height:320px;}
+    main.content{max-height:none;padding:32px 26px;}
+    header.top{padding:32px 28px 24px;}
+    header.top h1{font-size:30px;}
+    .chapter-header h2{font-size:32px;}
+    .block p, .block ul, .example-box, .pitfall-box, .exercise-box p{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <h1>📚 Curso Familiar — Aprende Claude</h1>
+    <p>De lo macro a lo específico: de "¿qué es esto?" a construir tu propio proyecto.</p>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 0 capítulos</div>
+      <button class="class-mode-btn" onclick="togglePreso()">🎤 Modo clase</button>
+    </div>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="content" id="content"></main>
+  </div>
+  <section class="preso-view" id="presoView"></section>
+</div>
+
+<script>
+const MODULE_COLORS = {
+  mStart: {name:'teal', var:'--teal', soft:'--teal-soft'},
+  m0: {name:'coral', var:'--coral', soft:'--coral-soft'},
+  m1: {name:'sky', var:'--sky', soft:'--sky-soft'},
+  m2: {name:'gold', var:'--gold', soft:'--gold-soft'},
+  m3: {name:'lavender', var:'--lavender', soft:'--lavender-soft'},
+  m4: {name:'olive', var:'--olive', soft:'--olive-soft'},
+  m5: {name:'rose', var:'--rose', soft:'--rose-soft'}
+};
+
+const COURSE = [
+{
+  id:'m0', title:'Módulo 0 — Fundamentos', color:'m0',
+  chapters:[
+    {
+      icon:'🧠', title:'¿Qué es esto que estamos usando?',
+      tech:'Claude es un modelo de lenguaje grande (LLM): una red neuronal entrenada con enormes cantidades de texto para predecir, token por token, cuál es la continuación estadísticamente más probable de un texto dado su contexto. Ese proceso de predicción, repetido miles de veces por respuesta, genera algo que se lee como una conversación coherente.',
+      simple:'Es un programa que adivina la próxima palabra, una y otra vez, tan bien entrenado que el resultado parece una persona pensando. No "sabe" nada como tú sabes algo — calcula probabilidades sobre patrones de texto que vio durante su entrenamiento.',
+      explanation:[
+        'Acá está el punto central de este capítulo: <strong>el modelo no es inteligente en el sentido humano — el inteligente eres tú.</strong> Claude no tiene intención propia, ni conciencia de qué le importa a tu familia, ni sabe qué proyecto vale la pena de verdad para ti. Lo que tiene es una capacidad enorme de generar lenguaje, código y estructura de forma coherente y útil.',
+        'La inteligencia real — el juicio, el propósito, el "para qué quiero esto" — la pones tú. Claude es el motor; tú manejas. Entender esto no menosprecia la herramienta: al revés, es lo que te permite usarla bien. Cuando sabes que es un predictor de patrones y no un oráculo, dejas de esperar que "adivine" lo que quieres y empiezas a decírselo con precisión (eso es "prompting" — más adelante, en el capítulo de Prompt y prompting).'
+      ],
+      examples:[
+        'Si escribes "El agua hierve a 100 grados" y le pides que continúe, el modelo no "sabe" de física — vio ese dato asociado a ese contexto millones de veces y predice que la frase natural sigue con "a nivel del mar".',
+        'Si le preguntas "¿qué opinas tú, de verdad, sobre esto?", no tiene una opinión propia guardada en alguna parte — genera la respuesta más coherente con el patrón de "cómo respondería alguien reflexivo a esa pregunta".'
+      ],
+      pitfall:'Un error común es tratar las respuestas de Claude como si vinieran de un juicio propio ("Claude cree que...", "Claude quiere..."). Es más preciso decir "Claude generó esta respuesta" — el peso del juicio sigue siendo tuyo.',
+      exercise:'Explícale a alguien de la familia, en una sola frase, la diferencia entre "Claude es inteligente" y "Claude predice patrones, tú aportas la inteligencia". Escribe esa frase aquí abajo (mentalmente o en tu tarea real) antes de marcar como completado.'
+    },
+    {
+      icon:'👻', title:'Alucinaciones',
+      tech:'Una "alucinación" es cuando un modelo genera información que suena plausible y segura, pero es objetivamente incorrecta o inventada — consecuencia directa de ser un predictor de patrones (ver "¿Qué es esto que estamos usando?") y no una base de datos de hechos verificados.',
+      simple:'Es cuando Claude "se lo inventa" con total seguridad, sin darse cuenta de que está equivocado.',
+      explanation:[
+        'Esto conecta directo con "¿Qué es esto que estamos usando?": como el modelo predice la continuación más probable de un texto, a veces esa continuación probable no es la verdadera. Es más frecuente con datos muy específicos (fechas exactas, cifras, nombres poco comunes) o temas donde el modelo tiene poca información confiable.',
+        'Por eso conviene verificar datos críticos, especialmente en temas técnicos, legales, médicos o financieros — y por eso conviene tener esto presente desde ya, antes de hacer cualquiera de los ejercicios del resto del curso.'
+      ],
+      examples:[
+        'Pedir una cita textual exacta de un libro específico es un escenario de alto riesgo — puede generar una frase creíble que el libro nunca dijo.',
+        'Pedir una cifra estadística muy específica sin fuente puede generar un número plausible pero no verificado.'
+      ],
+      pitfall:'La confianza con la que Claude dice algo no es un indicador de qué tan correcto es — puede sonar igual de seguro estando en lo correcto o alucinando.',
+      exercise:'Pídele a Claude un dato muy específico (una fecha exacta, una cifra) sobre algo que tú sepas de memoria, y verifica si acertó.'
+    },
+    {
+      icon:'⚙️', title:'Los motores: Haiku, Sonnet, Opus',
+      tech:'Anthropic no ofrece un solo modelo, sino una familia de modelos del mismo linaje ("Claude") en distintos tamaños, cada uno optimizado para un balance distinto entre velocidad, costo y profundidad de razonamiento. Hoy esa familia incluye, de menor a mayor, Haiku, Sonnet y Opus. Los números de versión cambian con el tiempo, pero la lógica de los tres tamaños se mantiene.',
+      simple:'Son como motores de auto. Haiku es el motor chico: parte al tiro, gasta poco, rinde perfecto para el trayecto corto. Sonnet es el motor equilibrado: el que usarías para casi todo, todos los días. Opus es el motor grande: más lento y "caro", pero con la potencia para los problemas difíciles de verdad.',
+      explanation:[
+        'No existe "el mejor motor" en abstracto — existe el motor correcto para la tarea. Haiku sirve para tareas simples y de alto volumen: responder algo corto, clasificar, resumir un mensaje. Sonnet es el caballo de batalla para escribir, programar, analizar y conversar — este mismo curso corre sobre Sonnet. Opus se justifica cuando la profundidad importa más que la velocidad: razonamiento complejo, investigación, decisiones con muchas variables cruzadas.',
+        'Elegir el motor no es "cuál es más inteligente", es "qué tan complejo es lo que estoy pidiendo, y cuánto me importa la velocidad versus la profundidad de la respuesta".'
+      ],
+      examples:[
+        '"Resume este mensaje de WhatsApp en una frase" → Haiku sobra y sobra.',
+        '"Ayúdame a pensar la arquitectura completa de mi proyecto familiar, considerando seguridad, costos y qué pasa si en 2 años somos 20 usando esto" → ahí se justifica Opus.'
+      ],
+      pitfall:'Usar siempre el motor más grande "por si acaso" no es gratis: es más lento y menos eficiente para tareas simples. La habilidad real es saber calibrar.',
+      exercise:'Piensa en 3 tareas que le pedirías a Claude esta semana. Para cada una decide: ¿Haiku, Sonnet u Opus? Justifica tu elección en una línea por tarea.'
+    },
+    {
+      icon:'🚪', title:'Las puertas de entrada: Chat, Cowork, Code',
+      tech:'Son las tres superficies principales para acceder a Claude, cada una diseñada para un tipo de trabajo distinto. Chat: interfaz conversacional (web, app móvil o de escritorio) para diálogo directo, ideas y contenido. Cowork: app de escritorio de trabajo agéntico, donde Claude ejecuta tareas de varios pasos por encargo. Claude Code: herramienta agéntica especializada en programar, para delegar tareas de código desde terminal, editor o app de escritorio/móvil. A esto se suman extensiones: Claude en Chrome, Excel y PowerPoint.',
+      simple:'Chat es hablar con Claude. Cowork es encargarle una pega larga y dejar que la resuelva sola, como un asistente que trabaja en otra pieza. Code es la versión especializada para programar — la que se usó para construir curso.html.',
+      explanation:[
+        'La elección depende de la naturaleza de la tarea, no de "cuál es mejor". Si necesitas pensar en voz alta, redactar o resolver una duda puntual → Chat. Si necesitas que algo se ejecute solo con múltiples pasos y herramientas (buscar, organizar, escribir varios documentos) → Cowork. Si el resultado final es código → Claude Code.',
+        'Todas comparten el mismo "cerebro" (los modelos Claude) — lo que cambia es el andamiaje alrededor: qué herramientas tiene disponibles y cómo estructura su trabajo. Existe además una cuarta forma de acceso, más técnica: la API, que permite que un programa propio use a Claude directamente, sin pasar por ninguna de estas 3 interfaces — se ve en detalle más adelante en el curso.'
+      ],
+      examples:[
+        'Pensar el contenido pedagógico de este curso → Chat (como esta misma conversación).',
+        'Escribir y depurar el archivo curso.html → Claude Code.'
+      ],
+      pitfall:'No es necesario elegir "una sola puerta para siempre" — muchos proyectos reales usan las tres en distintos momentos de su desarrollo.',
+      exercise:'De las 3 puertas, ¿cuál usarías para: (a) escribir una carta a un familiar, (b) organizar una lista de 40 invitados para un evento, (c) armar una pequeña calculadora? Asigna una puerta a cada tarea.'
+    }
+  ]
+},
+{
+  id:'mStart', title:'Módulo 1 — Primeros pasos', color:'mStart',
+  chapters:[
+    {
+      icon:'🔑', title:'Crear tu cuenta y tu plan',
+      tech:'Para usar Claude hace falta una cuenta en claude.ai asociada a un correo. Anthropic ofrece varios planes — Free, Pro, Max, Team y Enterprise — que se diferencian principalmente en cuántos mensajes puedes mandar antes de topar el límite de uso, qué modelos puedes elegir, y qué funciones tienes disponibles (Proyectos, Skills, Cowork, etc.).',
+      simple:'Es como cualquier otra cuenta: un correo, una clave, y listo. La diferencia entre planes es, básicamente, cuánto puedes usar a Claude antes de que te pida esperar, y qué herramientas extra vienen incluidas. Toda la familia ya tiene un plan pagado (Pro o Max), así que no hay que preocuparse por las limitaciones del plan gratuito.',
+      explanation:[
+        'Ojo con un detalle importante: Proyectos, Artefactos, Conectores y Skills en realidad también existen en el plan gratuito. Lo que suma un plan pagado como Pro o Max es acceso a Cowork y Claude Code, más modelos entre los cuales elegir, Proyectos sin límite de cantidad, y límites de uso bastante más altos — que es justamente lo que va a permitir que usen el curso sin quedarse cortos.',
+        'Cada persona de la familia entra con su propio correo — las cuentas no se comparten. Esto importa porque la Memoria y los Skills personalizados (más adelante en el curso) son individuales de cada cuenta, no compartidos automáticamente entre todos.'
+      ],
+      examples:[
+        'Entrar a claude.ai, iniciar sesión con tu correo, y verificar en Configuración → Plan que aparece "Pro" o "Max".',
+        'Si un familiar quiere que su hijo o hija tenga su propia cuenta, necesita su propio correo — no conviene compartir una sola cuenta entre varias personas.'
+      ],
+      pitfall:'Compartir una cuenta entre dos personas mezcla la memoria y el historial de ambos — Claude intentará recordar cosas de los dos como si fueran la misma persona. Mejor cada uno con la suya.',
+      exercise:'Entra a Configuración → Plan en tu cuenta y confirma que dice Pro o Max. Si tienes dudas de qué incluye, revisa también Configuración → Uso para ver tus límites.'
+    },
+    {
+      icon:'🖥️', title:'La pantalla: un recorrido rápido',
+      tech:'La interfaz de Claude.ai se organiza en tres zonas: una barra lateral con el historial de conversaciones y los Proyectos, un panel central donde ocurre la conversación, y una caja de texto abajo para escribir, adjuntar archivos y elegir modelo.',
+      simple:'Es como cualquier app de mensajería, pero con algunas cosas extra: puedes ver tus conversaciones anteriores a la izquierda, elegir qué "motor" usar antes de escribir, y adjuntar archivos con el botón del clip.',
+      explanation:[
+        'En la barra lateral izquierda están: "Nueva conversación" (empezar de cero), el historial de chats anteriores, y tus Proyectos si tienes alguno creado.',
+        'Debajo de cada respuesta de Claude hay íconos pequeños: copiar el texto, pulgar arriba/abajo (para dar feedback), y regenerar la respuesta. Vale la pena saber que existen antes de necesitarlos.'
+      ],
+      examples:[
+        'Para empezar una conversación nueva sin mezclar temas, se usa el botón "Nueva conversación", no seguir escribiendo en la misma de siempre.',
+        'El botón del clip (📎) junto a la caja de texto permite subir una foto, un PDF, o cualquier documento para que Claude lo lea.'
+      ],
+      pitfall:'Es tentador seguir usando la misma conversación para todo — pero una conversación muy larga hace que hasta las respuestas simples sean más lentas y consuman más (esto se explica más adelante, en el capítulo de Contexto). Abrir una conversación nueva no es desperdiciar nada, es buena práctica.',
+      exercise:'Abre claude.ai y ubica sin ayuda estos 4 elementos: el botón de nueva conversación, el selector de modelo, el botón para adjuntar un archivo, y el ícono de pulgar abajo bajo una respuesta.'
+    },
+    {
+      icon:'✉️', title:'Tu primer mensaje',
+      tech:'Un mensaje a Claude puede ser una pregunta de una línea, incluir archivos adjuntos, instrucciones detalladas, o ambas cosas. Claude responde dentro de la misma conversación, y se puede seguir iterando sobre esa respuesta con mensajes siguientes.',
+      simple:'No hay una forma "correcta" de empezar — puedes simplemente escribir como le escribirías a una persona. Mientras más claro seas sobre lo que necesitas, mejor te va a ir (esto se profundiza más adelante, en el capítulo de Prompting).',
+      explanation:[
+        'No hace falta ningún comando especial ni saber programar para empezar — se escribe en lenguaje natural, en español, tal como se piensa.',
+        'Después de la primera respuesta, la conversación sigue: puedes pedir que ajuste el tono, que lo haga más corto, que agregue algo — no hace falta "empezar de nuevo" cada vez que quieres un ajuste menor.'
+      ],
+      examples:[
+        'Un primer mensaje perfectamente válido: "Ayúdame a escribir un mensaje para avisarle a la familia que el asado del domingo se cambia de hora."',
+        'Después de la respuesta, seguir con: "hazlo más corto" o "cambia el tono a algo más formal" — sin repetir todo desde cero.'
+      ],
+      pitfall:'No es necesario "hablarle bonito" ni agregar "por favor" — Claude no se ofende ni responde mejor por cortesía. Lo que sí ayuda de verdad es la claridad.',
+      exercise:'Mándale a Claude tu primer mensaje real de esta semana — algo que de verdad necesites — y luego pídele un ajuste sobre esa misma respuesta, sin abrir una conversación nueva.'
+    },
+    {
+      icon:'📎', title:'Lo que Claude puede ver: texto, fotos y archivos',
+      tech:'Además de texto, Claude puede recibir y analizar imágenes (fotos, capturas de pantalla) y documentos (PDF, Word, Excel, entre otros) adjuntos directamente en el mensaje. Ese análisis ocurre dentro de esa conversación puntual, sujeto a las reglas de contexto que se ven más adelante.',
+      simple:'No es solo un chat de texto — le puedes mandar una foto, una captura de pantalla o un documento, y te puede ayudar a partir de eso: describir lo que ve, extraer datos, resumir, etc.',
+      explanation:[
+        'Esto abre varios casos de uso familiares: subir la foto de una boleta para ordenar gastos, subir el PDF de un contrato para que lo resuma, o subir la captura de un error en el computador para que ayude a resolverlo.',
+        'El archivo entra al contexto de esa conversación puntual — para volver a usarlo en otra conversación distinta hay que subirlo de nuevo, a menos que esté guardado dentro de un Proyecto.'
+      ],
+      examples:[
+        'Subir una foto de un mueble y preguntar "¿qué estilo es este y de qué época podría ser?".',
+        'Subir el PDF de un certificado médico y pedir "resume los puntos importantes de este documento".'
+      ],
+      pitfall:'Igual que con el texto, Claude puede "alucinar" detalles de una imagen o documento que no están realmente ahí — sobre todo si la imagen es borrosa o el documento es largo. Conviene verificar los datos críticos.',
+      exercise:'Sube una foto o un documento real (una boleta, una foto de un objeto, un PDF) y pídele a Claude algo concreto sobre eso: describir, resumir, o extraer un dato puntual.'
+    },
+    {
+      icon:'🛠️', title:'Si algo sale mal: corregir, regenerar, empezar de nuevo',
+      tech:'Cuando una respuesta no cumple lo esperado existen tres mecanismos: dar feedback con el pulgar abajo (retroalimentación a Anthropic, no cambia la respuesta), regenerar la respuesta (pedir una alternativa a la misma pregunta), y editar el mensaje original (corregir y volver a generar, reemplazando esa parte de la conversación).',
+      simple:'Si la respuesta no sirvió, no hay que "pelear" con Claude en el mismo hilo — mejor editar el mensaje original y volver a intentar, como si el intento fallido nunca hubiera pasado.',
+      explanation:[
+        'El pulgar abajo (👎) es feedback para Anthropic sobre esa respuesta puntual — útil para mejorar el producto, pero no cambia nada en el momento.',
+        'Editar el mensaje original, en vez de mandar uno nuevo diciendo "no, así no", es la opción más eficiente: reemplaza esa parte de la conversación en vez de sumarse a ella (esto se retoma en el capítulo de ahorro de tokens, más adelante).'
+      ],
+      examples:[
+        'Si Claude entendió mal el tono que pediste, en vez de escribir "no, quería algo más informal", mejor editar el mensaje original agregando esa aclaración desde el principio.',
+        'Si una respuesta se ve simplemente rara o con un error, el botón de "regenerar" pide un segundo intento sin cambiar nada del mensaje.'
+      ],
+      pitfall:'Regenerar y editar no son lo mismo: regenerar vuelve a intentar con el mismo mensaje; editar te deja cambiar lo que pediste antes de volver a intentar. Si el problema fue lo que pediste (no cómo lo respondió), edita, no regeneres.',
+      exercise:'La próxima vez que una respuesta de Claude no te convenza, prueba editar tu mensaje original en vez de mandar uno nuevo corrigiendo, y compara qué tan distinto se siente el resultado.'
+    }
+  ]
+},
+{
+  id:'m1', title:'Módulo 2 — Vocabulario esencial', color:'m1',
+  chapters:[
+    {
+      icon:'💬', title:'Prompt y prompting',
+      tech:'Un prompt es el texto de entrada que se le da a un modelo de lenguaje para generar una respuesta. Prompting es la práctica de diseñar ese texto de entrada —con instrucciones, ejemplos y contexto— para obtener el resultado deseado de forma consistente.',
+      simple:'El prompt es lo que le escribes a Claude. Prompting es aprender a escribirlo bien para que te entienda a la primera.',
+      explanation:[
+        'Como el modelo predice en base a patrones (ver "¿Qué es esto que estamos usando?"), la calidad de lo que pides determina directamente la calidad de lo que recibes. Un buen prompt es claro, específico, da contexto y —cuando es útil— muestra un ejemplo de lo que se espera.',
+        'No se trata de "hablarle bonito" a Claude, sino de reducir la ambigüedad: mientras menos tenga que adivinar, mejor el resultado.'
+      ],
+      examples:[
+        '"Escríbeme algo sobre el viaje" (vago) vs. "Escríbeme un mensaje de 3 líneas para el chat familiar, contándoles que reservé el viaje a la playa para enero, en tono entusiasta" (específico).',
+        'Agregar un ejemplo del resultado esperado ("quiero algo parecido a esto: ...") suele mejorar mucho la respuesta.'
+      ],
+      pitfall:'Un prompt largo no es lo mismo que un buen prompt — lo que importa es la claridad y la especificidad, no la extensión.',
+      exercise:'Toma un prompt vago que hayas escrito antes y reescríbelo agregando contexto, un objetivo específico y el formato que esperas como respuesta.'
+    },
+    {
+      icon:'🔤', title:'Tokens',
+      tech:'Un token es la unidad mínima de texto que un modelo de lenguaje procesa — puede ser una palabra completa, una parte de ella, o un signo de puntuación. Tanto el largo del contexto como el consumo de tu plan se miden en tokens.',
+      simple:'Son los "pedacitos" en que Claude corta el texto para leerlo y escribirlo. En español, una palabra suele equivaler a uno o dos tokens.',
+      explanation:[
+        'Entender tokens ayuda a entender dos cosas prácticas: por qué va a existir un límite de cuánto texto se puede procesar de una vez (esto se profundiza en el próximo capítulo, sobre la ventana de contexto), y por qué tu plan de Claude.ai tiene límites de uso — mientras más tokens hay que procesar, más rápido se consume tu límite de sesión o semanal.',
+        'Palabras poco comunes, nombres propios o términos técnicos suelen dividirse en más tokens que palabras simples y frecuentes.'
+      ],
+      examples:[
+        'La palabra "casa" es probablemente un solo token.',
+        'Una palabra como "extraordinariamente" puede dividirse en dos o tres tokens.'
+      ],
+      pitfall:'No es lo mismo "una palabra" que "un token" — por eso los límites técnicos casi nunca se explican en palabras, sino en tokens.',
+      exercise:'Cuenta cuántas palabras tiene tu último mensaje a Claude. ¿Cuántos tokens crees que es, aproximadamente?'
+    },
+    {
+      icon:'🖼️', title:'Contexto y ventana de contexto',
+      tech:'El "contexto" es toda la información disponible para el modelo al momento de generar una respuesta (la conversación, archivos adjuntos, memoria del proyecto). La "ventana de contexto" es el límite de cuánta información puede tener presente a la vez, medido en tokens (capítulo de Tokens, justo antes de este).',
+      simple:'Es lo que Claude "tiene a la vista" en este momento. Si algo no está en el contexto, es como si no existiera para esa respuesta puntual.',
+      explanation:[
+        'Esto explica por qué a veces hay que recordarle algo que se dijo hace muchos mensajes — si la conversación es muy larga, información antigua puede quedar fuera de la ventana.',
+        'Por eso los Proyectos (más adelante en este módulo) son tan útiles: fijan contexto importante de forma persistente, para que no dependa de qué tan reciente sea en la conversación.'
+      ],
+      examples:[
+        'Si subes un PDF al chat, ese documento entra al contexto de esa conversación mientras dura la sesión.',
+        'En una conversación de cientos de mensajes, Claude puede perder detalle de algo mencionado muy al principio — a menos que esté fijado en un Proyecto.'
+      ],
+      pitfall:'No confundas contexto (lo de esta conversación) con memoria (capítulo de Memoria, lo que persiste entre conversaciones) — son mecanismos distintos.',
+      exercise:'En una conversación larga que ya tengas, pregúntale a Claude algo que dijiste al principio. ¿Lo recuerda con precisión? ¿Por qué crees que sí o no?'
+    },
+    {
+      icon:'💾', title:'Memoria',
+      tech:'La memoria es un sistema que permite a Claude retener información relevante de conversaciones pasadas del mismo usuario, para aplicarla en conversaciones futuras sin que se repita manualmente el contexto.',
+      simple:'Es lo que hace que Claude "se acuerde" de cosas que le has contado antes, sin que tengas que volver a explicarlas cada vez.',
+      explanation:[
+        'La memoria no es lo mismo que el contexto de una sola conversación (capítulo de Contexto y ventana de contexto): la memoria persiste entre conversaciones distintas, mientras que el contexto es lo activo en la sesión actual.',
+        'La memoria se actualiza en segundo plano, así que conversaciones muy recientes pueden no estar reflejadas todavía — no es instantánea.'
+      ],
+      examples:[
+        'Si en una conversación anterior contaste que el proyecto se llama "Curso Familiar" y usa Supabase, en una conversación nueva Claude puede recordarlo sin que se lo repitas.',
+        'La memoria puede actualizarse o corregirse: si algo cambió (dejaste un trabajo, te mudaste), se puede pedir explícitamente que se actualice.'
+      ],
+      pitfall:'La memoria no es un registro perfecto ni completo de todo lo hablado — es un resumen con sesgo hacia lo reciente y lo repetido.',
+      exercise:'Pregúntale a Claude "¿qué recuerdas de mí?" y revisa si la información es correcta y sigue siendo relevante hoy.'
+    },
+    {
+      icon:'📁', title:'Proyectos',
+      tech:'Un "Proyecto" en claude.ai es un espacio de trabajo persistente con su propia memoria, archivos de contexto e instrucciones personalizadas, que agrupa todas las conversaciones relacionadas a un mismo objetivo.',
+      simple:'Es como una carpeta especial donde Claude recuerda todo el contexto de un tema específico, para que no tengas que explicárselo de nuevo cada vez.',
+      explanation:[
+        'Sin proyectos, cada conversación nueva parte de cero. Con un proyecto, puedes subir documentos de referencia, dejar instrucciones fijas ("siempre responde en este tono", "este es el estilo del curso") y todas las conversaciones dentro de ese proyecto comparten ese contexto automáticamente.',
+        'Esto es distinto de la memoria general (capítulo de Memoria): un proyecto acota el contexto a un tema específico y lo hace explícito, mientras que la memoria es más difusa y cruza toda tu actividad.'
+      ],
+      examples:[
+        'Esta conversación ocurre dentro de un Proyecto llamado "Curso Familiar" — por eso Claude ya sabe, sin que se lo repitas, que existe curso.html y que usan Supabase y Vercel.',
+        'Podrías crear un proyecto separado llamado "Recetas de la abuela" y subir ahí solo los documentos relacionados a eso, sin mezclar contexto con el curso.'
+      ],
+      pitfall:'Meter todo en un solo proyecto gigante (recetas, curso, finanzas) hace que el contexto se ensucie. Un proyecto por objetivo real mantiene todo más nítido.',
+      exercise:'Crea un Proyecto nuevo en claude.ai para algo tuyo (por ejemplo "Recetas de la abuela" o "Planificación del viaje") y sube un archivo de referencia real.'
+    },
+    {
+      icon:'🧩', title:'Artefactos',
+      tech:'Un artefacto es contenido generado por Claude que se muestra en una ventana separada de la conversación —código, documentos, diagramas, mini-aplicaciones— pensado para ser guardado, editado o reutilizado, en lugar de leído una sola vez.',
+      simple:'Es cuando Claude no solo te "contesta", sino que te entrega algo: un documento, un archivo, un mini-programa, en una ventana aparte que puedes guardar o seguir editando.',
+      explanation:[
+        'La distinción importa porque no todo merece ser un artefacto — una respuesta conversacional corta se queda en el chat; algo que vas a reutilizar (un documento, un componente de código, una plantilla) se convierte en artefacto para que tenga vida propia, independiente de la conversación que lo originó.',
+        'Este mismo curso interactivo que estás usando ahora mismo es un artefacto.'
+      ],
+      examples:[
+        'Pedir "hazme un resumen corto" → normalmente se queda como texto en el chat.',
+        'Pedir "hazme una calculadora de propinas que pueda reutilizar" → eso se convierte en artefacto.'
+      ],
+      pitfall:'Un artefacto muy largo puede tardar en generarse completo — por eso, para contenido extenso, conviene construirlo por partes.',
+      exercise:'Pídele a Claude que te genere un artefacto simple (por ejemplo, una lista de tareas en HTML) y guárdalo o revísalo.'
+    },
+    {
+      icon:'🔌', title:'Conectores y MCP',
+      tech:'MCP (Model Context Protocol) es un protocolo abierto que estandariza cómo un modelo como Claude se conecta con herramientas y datos externos (correo, calendario, bases de datos, apps de terceros). Un "conector" es la integración concreta con un servicio específico, construida sobre ese protocolo.',
+      simple:'MCP es como el enchufe universal; un conector es el aparato específico que enchufas ahí — Gmail, Google Drive, Calendar, etc. Gracias a eso, Claude puede leer o actuar sobre tus otras aplicaciones, siempre con tu permiso explícito.',
+      explanation:[
+        'Antes de MCP, cada integración con cada servicio se construía por separado, a mano. MCP le da a esas integraciones una forma común, lo que permite que crezcan mucho más rápido y que cualquiera —no solo Anthropic— pueda construir un conector nuevo.',
+        'Los conectores siempre piden tu autorización explícita — Claude no accede a tus cuentas por su cuenta.'
+      ],
+      examples:[
+        'Conectar Google Drive para pedir "búscame la presentación que subí la semana pasada sobre el viaje familiar".',
+        'Conectar el correo para pedir "resume los correos importantes de esta semana".'
+      ],
+      pitfall:'Un conector conectado no significa que Claude actúe solo sobre tus datos — acciones que envían, modifican o eliminan algo siempre piden confirmación tuya primero.',
+      exercise:'Revisa qué conectores tienes disponibles en tu cuenta de Claude. ¿Cuál te serviría más y para qué tarea concreta?'
+    },
+    {
+      icon:'🧠✨', title:'Skills',
+      tech:'Los Skills son recursos reutilizables, organizados como carpetas de archivos, que le dan a Claude experiencia específica en un dominio: instrucciones, contexto y buenas prácticas que convierten a un asistente general en uno especializado en una tarea concreta. Están disponibles en los planes Free, Pro, Max, Team y Enterprise de Claude.ai (requieren tener "ejecución de código" activada en Configuración).',
+      simple:'Es cuando le enseñas a Claude, una sola vez, cómo hacer bien una tarea específica — y de ahí en adelante la hace así, sin que se lo vuelvas a explicar. Es como entrenar a un ayudante nuevo: al principio hay que mostrarle cómo se hacen las cosas en tu casa, pero después ya lo sabe solo.',
+      explanation:[
+        'Hay dos tipos. Los Skills que ya vienen instalados (por ejemplo, para crear documentos Word, Excel, PowerPoint o PDF con buen formato) — Claude los usa automáticamente, sin que tengas que activarlos. Y los Skills personalizados, que tú puedes crear y subir como un archivo comprimido desde Configuración → Funciones, con las reglas específicas de cómo quieres que se haga algo.',
+        'Lo interesante es que Claude decide solo cuándo usar un Skill — no lo seleccionas tú desde un menú. Detecta que la tarea calza con lo que ese Skill sabe hacer, y lo aplica. Por eso conecta tan bien con el capítulo de Proyectos: un Proyecto guarda el contexto de un tema; un Skill guarda el "cómo se hace" de una tarea que se repite.'
+      ],
+      examples:[
+        'Cuando le pides a Claude "hazme un documento Word con esto", usa automáticamente el Skill de creación de documentos Word para que el resultado tenga formato profesional — sin que tengas que pedirlo explícitamente.',
+        'Si en la familia siempre piden un mismo tipo de reporte con el mismo formato, alguien podría crear un Skill personalizado con esas reglas exactas, y desde ese momento Claude las aplicaría solo cada vez que alguien lo pida.'
+      ],
+      pitfall:'Los Skills personalizados son individuales de cada cuenta — no se comparten automáticamente entre los miembros de la familia. Si quieren que todos usen el mismo Skill, cada uno tiene que subirlo por su lado.',
+      exercise:'Revisa en Configuración → Funciones de tu cuenta si tienes "ejecución de código" activada. Luego piensa en una tarea que hagas siempre de la misma forma (una carta, un reporte, una lista) y anota qué reglas le pondrías a un Skill para esa tarea.'
+    },
+    {
+      icon:'✍️', title:'Markdown (MD)',
+      tech:'Markdown es un lenguaje de marcado ligero para dar formato a texto plano usando una sintaxis simple de símbolos (#, *, -, etc.), interpretable por casi cualquier sistema sin necesidad de un procesador de texto complejo.',
+      simple:'Es una forma de "decorar" el texto —títulos, negritas, listas— usando símbolos simples en vez de botones de formato, que cualquier programa (incluido Claude) puede leer y transformar en texto bien presentado.',
+      explanation:[
+        'Es el formato preferido para documentos técnicos y de curso porque es liviano, legible incluso sin formatear, y fácil de convertir a HTML — que es exactamente lo que hace curso.html con contenido escrito así.',
+        'Por eso, cuando le pides a Claude un documento, muchas veces el resultado "de base" está en Markdown antes de convertirse en otra cosa (Word, HTML, PDF).'
+      ],
+      examples:[
+        'Escribir **importante** se convierte en <strong>importante</strong>.',
+        'Escribir # Título se convierte en un encabezado grande; escribir - item se convierte en una lista con viñetas.'
+      ],
+      pitfall:'Si copias texto en Markdown a un lugar que no lo interpreta (como un mensaje de WhatsApp), vas a ver los símbolos crudos (** y #) en vez del formato.',
+      exercise:'Escribe 3 líneas en Markdown (un título, una negrita, una lista) y pídele a Claude que te muestre cómo se ven renderizadas.'
+    },
+    {
+      icon:'🔋', title:'Cómo optimizar tu uso: ahorro de tokens y límites',
+      tech:'Los planes de Claude.ai (Free, Pro, Max, Team, Enterprise) tienen límites de uso medidos en tokens procesados dentro de una ventana de tiempo (sesión de horas y límite semanal). Según la documentación oficial de soporte, los factores que afectan cuánto se consume son: el largo del mensaje, el tamaño de los archivos adjuntos, el largo acumulado de la conversación, el uso de herramientas (búsqueda web, investigación), el modelo elegido, el nivel de esfuerzo, y la creación o uso de artefactos.',
+      simple:'No te cobran por "mensaje" — te cobran por cuánto texto tiene que procesar Claude cada vez, y eso incluye TODO lo que se ha hablado antes en esa misma conversación. Una conversación larga hace que hasta una pregunta simple consuma mucho más que al principio.',
+      explanation:[
+        'Esto conecta directo con los capítulos de Contexto y Tokens: cada vez que mandas un mensaje nuevo, Claude vuelve a "leer" toda la conversación desde el principio para poder responder. Por eso una conversación de 40 mensajes es más cara, mensaje por mensaje, que una recién empezada.',
+        'La buena noticia es que existen formas reales de optimizar esto, confirmadas por el propio soporte de Anthropic: agrupar preguntas relacionadas en un solo mensaje en vez de mandarlas una por una; ser específico para evitar idas y vueltas corrigiendo; usar Proyectos para documentos que se consultan seguido (ese contenido queda cacheado — reutilizarlo no se cuenta completo cada vez); y revisar el consumo propio en Configuración → Uso.'
+      ],
+      examples:[
+        'En vez de mandar "resúmelo", luego "hazlo más corto", luego "ahora en lista" — mejor pedir todo junto desde el inicio: "resúmelo en formato de lista, máximo 5 puntos".',
+        'Si vas a preguntar varias cosas sobre el mismo documento durante la semana, súbelo una sola vez a un Proyecto en vez de adjuntarlo de nuevo en cada conversación nueva.'
+      ],
+      pitfall:'Editar un mensaje anterior y regenerar la respuesta reemplaza esa parte de la conversación en vez de sumarse a ella, lo que suele ser más eficiente que mandar un mensaje nuevo diciendo "no, mejor así". No hay una cifra oficial exacta de cuánto se ahorra — varía según el caso — pero la lógica (reemplazar en vez de acumular) sí está confirmada.',
+      exercise:'Como tu plan es Pro o Max, entra a Configuración → Uso en tu cuenta de Claude.ai y revisa cuánto llevas consumido de tu límite de sesión y semanal. La próxima vez que tengas una conversación larga (+20 mensajes) que ya cumplió su propósito, pídele un resumen, ábrelo en un chat nuevo, y sigue desde ahí.'
+    }
+  ]
+},
+{
+  id:'m4', title:'Módulo 3 — Stack técnico', color:'m4',
+  chapters:[
+    {
+      icon:'💻', title:'¿Qué es programar? (código)',
+      group:'Conceptos básicos de programación',
+      tech:'Programar es escribir instrucciones, en un lenguaje que una máquina puede interpretar, para que ejecute una secuencia de acciones específicas. El "código" es el texto de esas instrucciones, escrito en un lenguaje de programación (HTML, JavaScript, SQL, etc.).',
+      simple:'Es como escribir una receta de cocina, pero para un computador: pasos exactos, en un orden exacto, sin espacio para "más o menos" — el computador hace exactamente lo que el código dice, ni más ni menos.',
+      explanation:[
+        'A diferencia de hablarle a Claude en español (donde hay margen para la ambigüedad), el código no perdona ambigüedad: una coma o una letra de más puede hacer que nada funcione. Por eso, cuando Claude "escribe código", está generando texto en un lenguaje mucho más estricto que el español.',
+        'No hace falta saber escribir código para beneficiarse de Claude — todo lo visto hasta ahora en el curso ya permite pedir cosas sin escribir una sola línea. Este módulo es para quienes quieren entender qué hay "debajo" de lo que Claude construye.'
+      ],
+      examples:[
+        'Cuando Claude Code modifica curso.html, está editando código: HTML (la estructura), CSS (los colores y el diseño) y JavaScript (lo que responde a un clic).',
+        'Un error de código tan simple como una coma faltante puede hacer que una página entera deje de funcionar — por eso el código se prueba antes de publicarlo (esto se retoma más adelante, en el capítulo de Deploy).'
+      ],
+      pitfall:'No hace falta entender código para dirigir un proyecto con Claude — pero entender que existe esta capa de estricta precisión ayuda a entender por qué a veces Claude necesita "arreglar" algo antes de que funcione, aunque la idea estuviera clara.',
+      exercise:'La próxima vez que Claude Code haga un cambio, mira brevemente el código que generó (sin necesidad de entenderlo todo) — solo para acostumbrar el ojo a cómo se ve.'
+    },
+    {
+      icon:'🧱', title:'HTML, CSS y JavaScript',
+      group:'Conceptos básicos de programación',
+      tech:'Son los tres lenguajes fundamentales de cualquier página web. HTML define la estructura y el contenido (qué elementos existen). CSS define la apariencia (colores, tamaños, espaciado). JavaScript define el comportamiento (qué pasa al hacer clic, cómo se actualiza la información).',
+      simple:'Si una página web fuera una casa: HTML son los muros y las habitaciones, CSS es la pintura y la decoración, y JavaScript es la electricidad — lo que hace que las cosas funcionen cuando aprietas un interruptor.',
+      explanation:[
+        'curso.html es, literalmente, un archivo que combina los tres — por eso se llama así, aunque contenga también CSS y JavaScript adentro.',
+        'No es necesario saber escribir en estos lenguajes para pedirle a Claude que construya algo — pero reconocer los nombres ayuda a entender de qué habla Claude al explicar un cambio ("agregué una regla de CSS para que el botón se vea más grande").'
+      ],
+      examples:[
+        'El color coral de las tarjetas de Conocimiento está definido en CSS.',
+        'Que un botón "haga algo" al hacer clic (como marcar una tarea como completada) es JavaScript funcionando.'
+      ],
+      pitfall:'Estos tres lenguajes no son intercambiables — un error de CSS (algo se ve mal) es un problema distinto a un error de JavaScript (algo no funciona al hacer clic), aunque a simple vista ambos parezcan "la página está rota".',
+      exercise:'Abre curso.html y ubica, sin buscar mucho, alguna parte que reconozcas como texto/estructura (HTML), algún color (CSS), o algo que reacciona a un clic (JavaScript).'
+    },
+    {
+      icon:'🗃️', title:'Qué es una base de datos',
+      group:'Conceptos básicos de programación',
+      tech:'Una base de datos es un sistema organizado para guardar, buscar y actualizar información de forma estructurada — generalmente en tablas con filas y columnas, con capacidad de manejar muchísima información a la vez y de forma segura.',
+      simple:'Es donde vive la información real del proyecto — quién es cada familiar, qué tareas existen, qué mensajes se han mandado — de forma ordenada, para que se pueda buscar y actualizar rápido.',
+      explanation:[
+        'A diferencia de un archivo de texto o una hoja de cálculo, una base de datos permite que muchas personas lean y escriban al mismo tiempo, sin pisarse entre ellos, y hace las búsquedas mucho más rápidas incluso con miles de registros.',
+        'Curso Familiar guarda toda su información en una base de datos — quién es cada familiar, qué tareas tiene cada uno, y los mensajes del chat privado — no directamente en curso.html.'
+      ],
+      examples:[
+        'Cuando alguien marca una tarea como completada, ese cambio se guarda en la base de datos, no en el archivo curso.html — por eso el cambio lo ven todos, sin que nadie suba un archivo nuevo.',
+        'Una tabla típica podría llamarse "tareas", con columnas como nombre, completada, fecha.'
+      ],
+      pitfall:'Confundir "el sitio web" (curso.html, lo que se ve) con "la base de datos" (donde vive la información real) es un error común — son dos piezas distintas que trabajan juntas.',
+      exercise:'Piensa en 3 tipos de información que usa Curso Familiar (tareas, mensajes, perfiles) y para cada una, decide si crees que vive en curso.html o en la base de datos.'
+    },
+    {
+      icon:'🖥️', title:'Qué es un servidor',
+      group:'Conceptos básicos de programación',
+      tech:'Un servidor es un computador (generalmente remoto, en la nube) que está siempre encendido y disponible, esperando solicitudes de otros computadores para responder con información o ejecutar una acción.',
+      simple:'Es el computador que nunca se apaga, donde vive de verdad la página web — cuando abres el sitio desde tu celular, en realidad le estás preguntando a un servidor "¿me muestras esta página?".',
+      explanation:[
+        'Vercel (donde está desplegado curso.html) y Supabase (donde vive la base de datos) son, en el fondo, servidores administrados por esas empresas — no hay que comprar ni mantener una máquina propia.',
+        'Esto se retoma más adelante, en el capítulo de Deploy: desplegar es, literalmente, poner el código a correr en un servidor para que deje de ser solo un archivo guardado y se convierta en algo accesible desde cualquier lugar.'
+      ],
+      examples:[
+        'Cuando un familiar abre el sitio desde su celular en la calle, su celular le habla al servidor de Vercel, que le responde con la página.',
+        'Si el servidor de Vercel estuviera apagado, nadie podría abrir el sitio, aunque el código siga existiendo perfecto en GitHub.'
+      ],
+      pitfall:'"El servidor está caído" es distinto de "mi internet está caído" — vale la pena diferenciarlos antes de asumir que algo se rompió en el proyecto.',
+      exercise:'La próxima vez que abras el sitio del curso, piensa en el camino que recorre esa solicitud: tu celular → internet → servidor de Vercel → de vuelta a tu celular.'
+    },
+    {
+      icon:'🔺', title:'Supabase',
+      group:'El stack real de Curso Familiar',
+      tech:'Supabase es una plataforma que ofrece, en un solo paquete, una base de datos (Postgres), almacenamiento de archivos (Storage), actualizaciones en tiempo real (Realtime) y autenticación de usuarios — todo administrado en la nube.',
+      simple:'Es el "motor" detrás de Curso Familiar: ahí viven los datos reales (tareas, mensajes, perfiles), los archivos que se suben (fotos, PDFs), y la magia de que un cambio aparezca al instante en la pantalla de otro familiar.',
+      explanation:[
+        'Curso Familiar usa 3 partes de Supabase en particular: la base de datos (tareas, perfiles, mensajes), el Storage (archivos subidos, como PDFs y fotos), y Realtime (para que el Chat Privado se actualice al instante).',
+        'Supabase es, en el fondo, una alternativa a construir un servidor propio desde cero — resuelve piezas comunes para que el proyecto no tenga que reinventarlas.'
+      ],
+      examples:[
+        'Cuando alguien sube un PDF en el curso, ese archivo se guarda en el Storage de Supabase, no directamente en el código.',
+        'El Chat Privado usa Realtime de Supabase para que un mensaje aparezca al instante en la pantalla del otro familiar, sin refrescar la página.'
+      ],
+      pitfall:'Supabase administra datos reales y sensibles de la familia — por eso las reglas de acceso (próximo capítulo, RLS) importan tanto: sin ellas, cualquiera con la key correcta podría ver o cambiar los datos de cualquier familiar.',
+      exercise:'Identifica, de memoria, 3 cosas del dashboard familiar que probablemente usan Supabase (pista: cualquier dato que persiste, cualquier archivo subido, cualquier actualización en vivo).'
+    },
+    {
+      icon:'🔐', title:'RLS (Row Level Security)',
+      group:'El stack real de Curso Familiar',
+      tech:'RLS (seguridad a nivel de fila) es un conjunto de reglas configuradas directamente en la base de datos que determinan qué filas de una tabla puede ver o modificar cada usuario, según quién es.',
+      simple:'Son las reglas que evitan que un familiar pueda ver o cambiar los mensajes privados de otro — no porque la app lo "esconda" en la pantalla, sino porque la base de datos misma se niega a entregar esos datos a quien no corresponde.',
+      explanation:[
+        'Esto es mucho más seguro que "esconder" datos solo en la pantalla: si la restricción vive únicamente en cómo se ve la página, alguien con conocimientos técnicos podría encontrar la forma de ver los datos igual. Con RLS, la propia base de datos rechaza la solicitud.',
+        'El Chat Privado de Curso Familiar usa exactamente este mecanismo: cada familiar solo puede leer las conversaciones en las que participa, aplicado directamente por Supabase, no por curso.html.'
+      ],
+      examples:[
+        'Una regla de RLS típica: "un usuario solo puede ver filas de la tabla mensajes donde él es el remitente o el destinatario".',
+        'Sin RLS, cualquier persona con la key de la base de datos podría, en teoría, leer los mensajes privados de todos — con RLS, la base de datos se lo impide.'
+      ],
+      pitfall:'Una base de datos sin RLS activado (o mal configurado) es una de las formas más comunes en que proyectos reales terminan filtrando datos sensibles por accidente — vale la pena confirmar que está activo en cualquier tabla con información privada.',
+      exercise:'Piensa en qué tabla de Curso Familiar sería más grave que NO tuviera RLS bien configurado (pista: la del Chat Privado), y por qué.'
+    },
+    {
+      icon:'📜', title:'Migración SQL',
+      group:'El stack real de Curso Familiar',
+      tech:'Una migración es un archivo que registra, paso a paso, los cambios hechos a la estructura de una base de datos (crear una tabla, agregar una columna) — escrito en SQL, el lenguaje con el que se habla con una base de datos como la de Supabase.',
+      simple:'Cumple una función parecida a la de un "commit" (algo que van a ver más adelante, en Control de versiones), pero aplicada a la estructura de la base de datos en vez de al código.',
+      explanation:[
+        'Sin migraciones, cambiar la base de datos sería manual y no quedaría registro — si algo se rompe, no habría forma clara de saber qué cambió ni cómo revertirlo.',
+        'Curso Familiar guarda sus migraciones junto al código en el mismo repositorio de GitHub — así, la estructura de la base de datos también tiene historial, no solo el código de curso.html.'
+      ],
+      examples:[
+        'Cuando se agregó el Chat Privado, probablemente existió una migración que creó la tabla de mensajes y sus reglas de RLS.',
+        'Una migración simple podría decir, en SQL: "agrega una columna llamada completada a la tabla tareas".'
+      ],
+      pitfall:'Cambiar la base de datos directamente desde el panel de Supabase (sin dejar una migración registrada) funciona, pero rompe el historial — el cambio queda "invisible" para cualquiera que revise el repositorio después.',
+      exercise:'Busca en el repositorio del curso si existe una carpeta de migraciones SQL, y cuántos archivos hay ahí.'
+    },
+    {
+      icon:'🛡️', title:'Privacidad: qué pasa con lo que le cuentan a Claude',
+      group:'Privacidad y datos familiares',
+      tech:'Anthropic no usa las conversaciones de los planes Pro, Max, Team ni Enterprise para entrenar sus modelos por defecto. Además, existen configuraciones específicas en la cuenta para controlar retención de datos y participación en mejoras de producto.',
+      simple:'Lo que cada familiar le cuenta a Claude, en un plan pagado como Pro o Max, no se usa para "enseñarle" al modelo, salvo que la persona decida explícitamente compartirlo.',
+      explanation:[
+        'Esto es especialmente relevante para una familia que comparte información personal con Claude: fotos, documentos, situaciones privadas. Vale la pena que cada uno revise su configuración en Configuración → Privacidad, en vez de asumir un comportamiento por defecto sin confirmarlo.',
+        'La privacidad de "lo que le cuentas a Claude" es un tema distinto de la seguridad de "los datos guardados en Supabase" (RLS, ya visto) — ambos importan, pero son capas diferentes del mismo proyecto.'
+      ],
+      examples:[
+        'Antes de subir un documento con información médica o financiera sensible, vale la pena confirmar en Configuración qué plan y qué configuración de privacidad tiene esa cuenta.',
+        'Compartir una foto familiar para pedir ayuda puntual es distinto a dejarla guardada permanentemente en un Proyecto compartido — vale la pena pensar cuál es necesario en cada caso.'
+      ],
+      pitfall:'La configuración de privacidad puede variar entre planes y cambiar con el tiempo — en vez de asumir "esto es privado por defecto", conviene revisarlo directamente en la cuenta cuando hay dudas, especialmente antes de compartir algo sensible.',
+      exercise:'Entra a Configuración → Privacidad en tu cuenta de Claude.ai y revisa qué opciones existen, sin necesidad de cambiar nada todavía.'
+    },
+    {
+      icon:'🙈', title:'Qué compartir con Claude (y qué pensar dos veces antes de subir)',
+      group:'Privacidad y datos familiares',
+      tech:'Aunque una conversación sea privada para Anthropic (capítulo anterior), sigue siendo información registrada en el historial de la cuenta — por lo que la decisión de QUÉ compartir sigue siendo una decisión de cada persona, independiente de la política de privacidad de la plataforma.',
+      simple:'Que algo sea "privado para la empresa" no es lo mismo que "no importa lo que subas" — sigue siendo tu información, guardada en algún lado, y vale la pena tratarla con el mismo criterio que cualquier otro dato personal.',
+      explanation:[
+        'Para una familia con niños (fotos, documentos escolares, información de salud), vale la pena tener una norma simple y compartida: información realmente sensible (contraseñas, datos financieros completos, documentos de identidad) mejor no se sube nunca — se resume o se pregunta sin el dato exacto.',
+        'Esto no es exclusivo de Claude — es la misma lógica de cuidado que aplicarían con cualquier otra herramienta digital nueva que empiece a usar la familia.'
+      ],
+      examples:[
+        'Pedir ayuda para "entender esta cláusula de un contrato" es razonable subiendo el documento completo; pedir ayuda con una contraseña real nunca lo es — para eso, se cambia la contraseña, no se comparte.',
+        'Subir la foto de un certificado médico para que Claude resuma los puntos importantes es un uso razonable; dejarlo guardado permanentemente en un Proyecto compartido, quizás no.'
+      ],
+      pitfall:'El criterio de "esto es solo para mi familia, no importa" puede llevar a bajar la guardia con información que, si la cuenta se comprometiera alguna vez, sería igual de sensible que en cualquier otro contexto.',
+      exercise:'Como familia, definan juntos 2 o 3 categorías de información que decidan NO subir nunca a Claude (ej. contraseñas, números de tarjetas, documentos de identidad completos).'
+    }
+  ]
+},
+{
+  id:'m2', title:'Módulo 4 — Cómo se construye un proyecto real', color:'m2',
+  chapters:[
+    {
+      icon:'📰', title:'PRFAQ (Press Release + FAQ)',
+      group:'Metodología para crear con Claude',
+      tech:'Metodología de desarrollo de producto (popularizada por Amazon) donde, antes de construir nada, se escribe el comunicado de prensa ideal del producto ya terminado y exitoso, seguido de las preguntas frecuentes —internas y externas— que surgirían sobre él.',
+      simple:'Escribes la noticia de cómo te gustaría que fuera tu proyecto el día que ya esté funcionando y le vaya bien, y luego respondes las dudas obvias que cualquiera tendría, antes de escribir una sola línea de código.',
+      explanation:[
+        'Sirve para pensar "de atrás hacia adelante": obliga a tener clarísimo el resultado final y para quién es valioso, antes de perderse en los detalles técnicos.',
+        'Es exactamente lo que llenarían en la sección "Idea" de sus tarjetas en Mi Proyecto: si no pueden escribir el PRFAQ con claridad, probablemente la idea todavía no está madura.'
+      ],
+      examples:[
+        'Para "Curso Familiar" mismo: "Hoy la familia lanzó su propio curso para aprender a usar Claude, construido por Francisco... ¿Por qué lo hicieron? ¿Cómo funciona? ¿Necesitas saber programar?" — y ahí se responde cada pregunta.',
+        'Para un proyecto nuevo de un familiar: "Esta semana, Elisa lanzó un catálogo digital de sus recetas favoritas, accesible desde el celular de toda la familia..."'
+      ],
+      pitfall:'No es un ejercicio de marketing exagerado — el valor está en la honestidad: si no puedes justificar por qué alguien lo usaría, el PRFAQ te lo muestra antes de invertir tiempo construyendo.',
+      exercise:'Escribe el titular de una noticia imaginaria sobre tu propio proyecto en Mi Proyecto, ya terminado y funcionando.'
+    },
+    {
+      icon:'📋', title:'PRD (Product Requirements Document)',
+      group:'Metodología para crear con Claude',
+      tech:'Documento que especifica qué se va a construir: el problema que resuelve, para quién, los requisitos funcionales y no funcionales, y qué define que el proyecto está "listo".',
+      simple:'La lista detallada de qué tiene que hacer tu proyecto y cómo sabes que quedó bien, antes de empezar a construirlo.',
+      explanation:[
+        'Si el PRFAQ es el "para qué" y el "para quién", el PRD es el "qué exactamente" — el puente entre la idea y la construcción real.',
+        'Un buen PRD evita ambigüedad: en vez de "debe ser fácil de usar", dice cosas verificables como "un usuario sin experiencia técnica debe poder completar la tarea X en menos de 2 minutos".'
+      ],
+      examples:[
+        'PRD de la pestaña Tareas de curso.html: "el admin puede crear tareas con texto enriquecido y múltiples adjuntos; cada miembro ve su propio estado de completitud (verde/rojo); no se pueden eliminar tareas ya completadas por otros".',
+        'PRD de un proyecto familiar de recetas: "cada receta tiene foto, ingredientes y pasos; se puede buscar por nombre; solo el autor puede editar la suya".'
+      ],
+      pitfall:'Un PRD demasiado vago ("que funcione bien") no sirve para construir ni para saber si terminaste — la especificidad es lo que lo hace útil.',
+      exercise:'Para la misma idea del capítulo de PRFAQ, escribe 3 requisitos concretos: qué debe poder hacer, para quién es, y cómo sabes que "está listo".'
+    },
+    {
+      icon:'🌱', title:'MVP (Producto Mínimo Viable)',
+      group:'Metodología para crear con Claude',
+      tech:'Concepto de desarrollo de producto que designa la versión más simple de un producto capaz de entregar valor real y generar aprendizaje a partir del uso real, con la menor inversión de tiempo y recursos posible, antes de construir funciones adicionales.',
+      simple:'Es la versión "flaca pero funcional" de tu idea — lo mínimo que tiene que existir para que alguien de verdad la use y tú aprendas si sirve, antes de gastar semanas puliendo detalles que capaz nadie necesita.',
+      explanation:[
+        'Conecta directo con el capítulo de PRD: el PRD dice QUÉ hay que construir; el MVP decide CUÁNTO de eso construir primero. No es "la versión fea" del proyecto — es la versión que prueba la idea central con el menor esfuerzo posible.',
+        'El error más común es confundir MVP con "prototipo a medio terminar". Un buen MVP igual resuelve el problema real de punta a punta — solo que de la forma más simple posible (a mano en vez de automático, sin notificaciones, sin diseño pulido).'
+      ],
+      examples:[
+        'El MVP de "Mi Proyecto" en curso.html podría haber sido: tarjetas con solo nombre e idea en texto plano, sin fotos ni modales — para probar si la familia de verdad usaba el concepto antes de invertir en el diseño completo.',
+        'Para el catálogo de recetas de un familiar, el MVP podría ser un documento de Word compartido, antes de construir una página web con base de datos.'
+      ],
+      pitfall:'Un MVP no significa "hazlo mal a propósito" — significa recortar alcance (menos funciones), no calidad (que funcione mal). Un MVP que no funciona de verdad no sirve para aprender nada.',
+      exercise:'Para tu propia idea en Mi Proyecto, describe cuál sería la versión más chica posible que ya resolvería el problema real. ¿Qué le sacarías para tener algo usable esta semana en vez de en un mes?'
+    },
+    {
+      icon:'🗺️', title:'Roadmap',
+      group:'Metodología para crear con Claude',
+      tech:'Documento o vista que comunica, en el tiempo, qué se va a construir y en qué orden — generalmente organizado por fases o períodos, conectando cada elemento con el objetivo al que sirve.',
+      simple:'Es el plan de "qué viene primero, qué viene después" — como el índice de módulos de este mismo curso, pero para tu propio proyecto.',
+      explanation:[
+        'Un roadmap no es una lista de tareas técnica — es una comunicación de prioridades y secuencia, pensada para que otros (o tú mismo, más adelante) entiendan el "por qué ahora" de cada cosa.',
+        'Los roadmaps más útiles se organizan por objetivo o resultado ("mejorar la privacidad", "hacer más fácil subir fotos"), no solo por fecha — la fecha es la consecuencia de la prioridad, no el punto de partida.'
+      ],
+      examples:[
+        'El roadmap real de Curso Familiar podría verse así: Fase 1 — Conocimiento y Mi Proyecto (listo) → Fase 2 — Tareas y Chat (listo) → Fase 3 — Chat Privado con RLS (listo) → Fase 4 — este curso interactivo (en curso).',
+        'Un roadmap simple no necesita fechas exactas: "Corto plazo: terminar el Módulo 4. Mediano plazo: agregar diagramas visuales. Más adelante: pasar esto a las tarjetas reales de Conocimiento."'
+      ],
+      pitfall:'Un roadmap con demasiado detalle técnico deja de ser útil para comunicar prioridades — mejor mantenerlo a nivel de "qué" y "para qué", y dejar el "cómo" para otro documento.',
+      exercise:'Escribe un roadmap de 3 líneas para tu propio proyecto en Mi Proyecto: qué harías primero, qué después, y qué dejarías para "más adelante".'
+    },
+    {
+      icon:'🚶', title:'Caso de uso / User story',
+      group:'Metodología para crear con Claude',
+      tech:'Descripción concreta de cómo una persona específica, con un objetivo específico, interactúa con un producto para lograrlo. En su forma más usada (user story), sigue un formato como "Como [tipo de persona], quiero [una acción], para [un beneficio]".',
+      simple:'Es contar la historia de una persona real usando tu proyecto, en vez de describirlo en abstracto — te obliga a pensar en "para quién" y "para qué", no solo en "qué hace".',
+      explanation:[
+        'Conecta directo con PRFAQ y PRD: el PRFAQ arranca desde el resultado final, el PRD detalla los requisitos, y el caso de uso llena el paso intermedio — obliga a pensar en el camino que recorre una persona real, paso a paso, no solo en la lista de funciones.',
+        'Escribir varios casos de uso (uno por tipo de persona que usaría el proyecto) ayuda a descubrir funciones que faltan, porque obliga a "caminar" la experiencia completa en vez de solo listar ideas sueltas.'
+      ],
+      examples:[
+        'Para Mi Proyecto en curso.html: "Como Francisco (admin), quiero revisar qué tareas completó cada familiar, para saber a quién ayudar con el curso."',
+        'Para un catálogo de recetas: "Como Elisa, quiero buscar una receta por un ingrediente que me sobró, para decidir qué cocinar hoy."'
+      ],
+      pitfall:'Un caso de uso demasiado genérico ("como usuario, quiero usar la app, para que funcione bien") no sirve de nada — mientras más específica la persona y el objetivo, más útil es para diseñar bien.',
+      exercise:'Escribe un caso de uso para tu propia idea en Mi Proyecto, usando el formato "Como [persona], quiero [acción], para [beneficio]" — con el nombre real de alguien de la familia, no genérico.'
+    },
+    {
+      icon:'🐙', title:'GitHub',
+      group:'Control de versiones',
+      tech:'GitHub es una plataforma que aloja repositorios en la nube y agrega herramientas alrededor de Git (el sistema de control de versiones): historial visual, colaboración entre varias personas, y conexión con otros servicios como Vercel.',
+      simple:'Si el repositorio es la carpeta con superpoderes, GitHub es la casa donde esa carpeta vive en internet — accesible desde cualquier lugar, con una interfaz visual para verla sin usar comandos.',
+      explanation:[
+        'Git (el sistema) y GitHub (la plataforma) no son lo mismo, aunque se usan casi como sinónimos: Git es la tecnología de versionado; GitHub es un servicio que la aloja y le agrega una interfaz web, permisos, y conexiones a otras herramientas.',
+        'Es lo que permite que Vercel (el hosting) sepa automáticamente cuándo hay una versión nueva de curso.html para publicar — Vercel está "escuchando" los cambios en GitHub.'
+      ],
+      examples:[
+        'El repositorio franciscomatthews-oss/claude-familia vive en GitHub, visible en github.com con su historial completo.',
+        'Cuando se sube un cambio a GitHub, eso dispara automáticamente un nuevo despliegue en Vercel (siguiente capítulo).'
+      ],
+      pitfall:'Un repositorio en GitHub puede ser público o privado — vale la pena saber cuál es el caso del proyecto familiar, porque un repo público significa que cualquiera en internet puede ver el código (aunque no los datos reales de Supabase).',
+      exercise:'Entra a github.com/franciscomatthews-oss/claude-familia y confirma si el repositorio es público o privado.'
+    },
+    {
+      icon:'📦', title:'Repositorio',
+      group:'Control de versiones',
+      tech:'Un repositorio (o "repo") es la carpeta versionada donde vive todo el código y el historial completo de cambios de un proyecto — cada archivo, y cada versión anterior de cada archivo, queda guardado ahí.',
+      simple:'Es la carpeta "oficial" del proyecto, pero con superpoderes: no solo tiene los archivos de hoy, tiene guardada la historia completa de cómo llegaron a ser lo que son.',
+      explanation:[
+        'A diferencia de una carpeta común, un repositorio registra cada cambio como un punto en el tiempo al que se puede volver. Nada se pierde para siempre — si algo se rompe, existe una versión anterior a la que regresar.',
+        'El repositorio de Curso Familiar se llama franciscomatthews-oss/claude-familia, y ahí vive curso.html junto con todas las migraciones SQL y su historial completo de cambios.'
+      ],
+      examples:[
+        'Cuando se corrige un error en curso.html, ese cambio queda registrado en el repositorio para siempre, con fecha y detalle de qué se modificó.',
+        'Si algo se rompe después de un cambio, se puede "volver atrás" a la versión de ayer del repositorio.'
+      ],
+      pitfall:'Un repositorio no es lo mismo que una copia de seguridad manual — el versionado es automático y granular (cambio por cambio), no una sola foto completa cada cierto tiempo.',
+      exercise:'Entra al repositorio del curso en GitHub y mira su historial de cambios — identifica el más reciente y qué archivo modificó.'
+    },
+    {
+      icon:'📝', title:'Commit',
+      group:'Control de versiones',
+      tech:'Un commit es una "fotografía" guardada de cómo estaba el código en un momento específico, junto con un mensaje que describe qué cambió y por qué.',
+      simple:'Es como guardar una versión con nombre y fecha — "así se veía el proyecto justo después de este cambio", para siempre.',
+      explanation:[
+        'Cada commit tiene un mensaje corto que resume el cambio ("arreglar subida de PDFs rotos", "agregar Chat Privado") — eso permite entender la historia completa del proyecto solo leyendo los mensajes, sin abrir cada archivo.',
+        'Los commits se acumulan uno tras otro, formando una línea de tiempo completa de cómo se construyó el proyecto, capítulo a capítulo.'
+      ],
+      examples:[
+        'El commit que arregló las subidas de PDF probablemente tenga un mensaje como "fix: silent catch swallowing storage errors".',
+        'Revisar los commits de un repositorio es como leer el changelog de una película: quién cambió qué, y cuándo.'
+      ],
+      pitfall:'Un buen commit tiene un mensaje claro y específico — "cambios varios" no ayuda a nadie (ni siquiera a uno mismo) a entender la historia después.',
+      exercise:'Busca en el historial del repositorio el commit más reciente y lee su mensaje. ¿Se entiende, sin ver el código, qué cambió?'
+    },
+    {
+      icon:'🌿', title:'Rama (branch) y main',
+      group:'Control de versiones',
+      tech:'Una rama (branch) es una línea de desarrollo paralela dentro del mismo repositorio, que permite trabajar en cambios sin afectar la versión "oficial" hasta que estén listos. "main" es, por convención, la rama principal — la que representa la versión real y funcionando del proyecto.',
+      simple:'Es como tener una copia de práctica del proyecto para probar cambios, sin arriesgar la versión que todos están usando. Cuando el cambio ya funciona bien, se junta ("merge") con main.',
+      explanation:[
+        'Trabajar directo en main es arriesgado para cambios grandes: si algo sale mal a medio camino, el proyecto que todos usan queda roto. Una rama aparte permite experimentar con calma.',
+        'No es obligatorio usar ramas para todo — para un proyecto chico y de una sola persona, a veces se trabaja directo en main. Pero para cambios grandes (como un rediseño importante) valen la pena.'
+      ],
+      examples:[
+        'Antes de un rediseño grande, se podría crear una rama aparte, probar ahí con calma, y solo después juntarla con main una vez confirmado que funciona.',
+        'main de claude-familia es, en todo momento, lo que está realmente desplegado en claude-familia.vercel.app.'
+      ],
+      pitfall:'Una rama que nunca se junta con main (o que queda "viva" por meses) tiende a desincronizarse tanto del proyecto real que juntarla después se vuelve difícil. Las ramas son para uso temporal, no permanente.',
+      exercise:'En el repositorio del curso, revisa si existe alguna rama además de main. Si no hay ninguna, ese es exactamente el patrón de "todo directo a main".'
+    },
+    {
+      icon:'🚀', title:'Deploy (despliegue)',
+      group:'Control de versiones',
+      tech:'El "deploy" (despliegue) es el proceso de tomar el código de un repositorio y publicarlo en un servidor real, donde queda accesible para los usuarios finales — en este caso, en la URL claude-familia.vercel.app.',
+      simple:'Es el paso donde el código deja de ser "solo archivos guardados en GitHub" y se convierte en la página web real que la familia puede abrir en su celular.',
+      explanation:[
+        'Vercel está conectado directamente al repositorio de GitHub: cada vez que hay un cambio nuevo en main, Vercel lo detecta y hace un deploy automático, sin que nadie tenga que hacerlo a mano.',
+        'Esto significa que "guardar un cambio en GitHub" y "que la familia vea el cambio en el sitio" están conectados, pero no son lo mismo — el deploy es el puente entre ambos, y toma unos segundos o minutos.'
+      ],
+      examples:[
+        'Cuando se arregló el bug de las subidas de PDF, ese cambio se subió a GitHub y Vercel lo desplegó automáticamente — nadie tuvo que "publicarlo" a mano.',
+        'Si algo se ve raro en el sitio después de un cambio, lo primero a revisar es si el deploy terminó bien en el panel de Vercel.'
+      ],
+      pitfall:'Un deploy puede fallar (por un error en el código) sin que se note de inmediato — vale la pena revisar el estado del deploy en Vercel después de cambios importantes, no asumir que "se subió a GitHub" es lo mismo que "ya está en línea".',
+      exercise:'Entra al panel de Vercel del proyecto y revisa el estado del último deploy: ¿fue exitoso? ¿cuánto se demoró?'
+    },
+    {
+      icon:'🔑', title:'API Key',
+      group:'Acceso programático y seguridad',
+      tech:'Una API key (llave de API) es una credencial única y secreta que identifica y autentica a quien hace una solicitud programática a un servicio — como la API de Anthropic o la de Supabase — permitiendo que ese servicio sepa quién es y cuánto puede usar.',
+      simple:'Es como una clave de acceso, pero para que un programa (no una persona) se identifique ante un servicio. Sin la key correcta, la solicitud queda rechazada.',
+      explanation:[
+        'A diferencia de usar claude.ai con usuario y clave, usar la API de Anthropic directamente (para construir algo propio, como una automatización) requiere generar una API key desde la Consola de Anthropic, y esa key se cobra por uso real (tokens procesados) — un sistema de cobro distinto al de los planes de claude.ai vistos antes, que tienen un límite fijo incluido en la suscripción.',
+        'Cualquier servicio que se llame "desde código" en vez de "desde una pantalla" —Anthropic, Supabase, Vercel— probablemente use este mismo mecanismo de autenticación.'
+      ],
+      examples:[
+        'El proyecto de Curso Familiar usa una API key de Supabase para que curso.html pueda leer y escribir en la base de datos.',
+        'Si alguien quisiera automatizar algo con Claude fuera de claude.ai (por ejemplo, procesar cientos de fotos de recetas automáticamente), necesitaría una API key de Anthropic para eso.'
+      ],
+      pitfall:'Una API key es equivalente a una contraseña — quien la tenga puede usarla y generar cargos o acciones a tu nombre. Nunca se comparte, nunca se pega en un mensaje de chat, y nunca se sube a un repositorio.',
+      exercise:'Sin generar ninguna key todavía, ubica dónde se crean las API keys en la Consola de Anthropic (console.anthropic.com) — solo para saber dónde vive esa función.'
+    },
+    {
+      icon:'🗄️', title:'Variable de entorno (.env)',
+      group:'Acceso programático y seguridad',
+      tech:'Una variable de entorno es un valor (como una API key) que se guarda fuera del código fuente, en un archivo o configuración separada (comúnmente llamado .env), y que el programa lee en el momento de ejecutarse — nunca queda escrito directamente en el código.',
+      simple:'Es la forma correcta de guardar una clave secreta: en un lugar aparte, no mezclada con el código que sí se comparte o se sube a internet.',
+      explanation:[
+        'Si una API key se escribe directamente dentro de un archivo de código (ej. dentro de curso.html) y ese archivo se sube a un repositorio en GitHub, la key queda expuesta para cualquiera que vea el repositorio — incluso si después se borra, puede quedar guardada en el historial de Commits.',
+        'Los archivos .env se mantienen fuera del repositorio a propósito (ver el capítulo de .gitignore), y en su lugar cada plataforma (Vercel, Supabase) ofrece un lugar seguro en su configuración para guardar esas variables.'
+      ],
+      examples:[
+        'En vez de escribir la key de Supabase directamente en curso.html, se guarda como variable de entorno en la configuración de Vercel, y el código la referencia sin mostrarla nunca.',
+        'Un archivo .env típico tiene líneas como SUPABASE_KEY=xxxxx — y ese archivo nunca se comparte ni se sube a GitHub.'
+      ],
+      pitfall:'Un error muy común (y grave) es copiar y pegar una API key directamente en el código "para probar rápido" y olvidarla ahí. Aunque funcione igual, es la forma menos segura de hacerlo.',
+      exercise:'Revisa (sin cambiar nada) si el proyecto Curso Familiar guarda sus credenciales de Supabase como variables de entorno en Vercel, en vez de escritas directamente en curso.html.'
+    },
+    {
+      icon:'🚫', title:'.gitignore',
+      group:'Acceso programático y seguridad',
+      tech:'El archivo .gitignore es una lista de nombres de archivos y carpetas que Git debe ignorar deliberadamente — nunca los incluye en un commit, aunque existan en la carpeta del proyecto.',
+      simple:'Es la lista de "esto no se sube al repositorio, nunca" — ahí es donde se anota el archivo .env, para que la API key jamás quede guardada en el historial de GitHub.',
+      explanation:[
+        'Conecta directo con Repositorio y Commit: todo lo que no está en .gitignore, en principio, puede terminar subido al historial del repositorio. El .gitignore es la barrera que evita que eso pase con archivos sensibles.',
+        'No es exclusivo de credenciales — también se usa para ignorar archivos temporales o generados automáticamente que no tiene sentido versionar.'
+      ],
+      examples:[
+        'Una línea típica dentro de .gitignore: .env — eso le dice a Git "nunca incluyas este archivo, pase lo que pase".',
+        'Si alguien olvida agregar .env al .gitignore y hace commit, la key queda en el historial para siempre, incluso si se borra después.'
+      ],
+      pitfall:'Agregar un archivo a .gitignore DESPUÉS de que ya se subió una vez no lo elimina del historial pasado — si una key ya se subió por error, hay que generarla de nuevo (rotarla), no solo esconder el archivo de ahí en adelante.',
+      exercise:'Busca si el repositorio de Curso Familiar tiene un archivo .gitignore, y revisa si .env (o algo equivalente) está en esa lista.'
+    },
+    {
+      icon:'🚀✨', title:'Qué se puede construir con acceso a la API',
+      group:'Acceso programático y seguridad',
+      tech:'Tener una API key permite usar Claude fuera de la interfaz de claude.ai: dentro de programas propios, automatizaciones, sitios web, o integraciones con otros servicios — sin las limitaciones de una conversación de chat manual.',
+      simple:'Es la diferencia entre "conversar con Claude a mano, mensaje por mensaje" y "hacer que un programa le hable a Claude automáticamente, las veces que haga falta, sin que nadie esté mirando".',
+      explanation:[
+        'Esto es, literalmente, lo que permite que existan cosas como los artefactos con IA integrada (un mini-programa dentro del chat que llama a la API de Claude por su cuenta), o automatizaciones que procesan muchos archivos sin intervención manual.',
+        'No reemplaza a claude.ai — son dos formas de acceso distintas para necesidades distintas: conversar y crear a mano (claude.ai) versus construir algo que use a Claude como motor interno (API).'
+      ],
+      examples:[
+        'Un artefacto que analiza automáticamente cada foto de receta que se sube y genera una ficha ordenada, sin que alguien tenga que pedírselo a mano cada vez.',
+        'Una automatización que revisa cada noche si hay tareas nuevas y le pide a Claude un resumen para mandarlo por correo a la familia.'
+      ],
+      pitfall:'Usar la API tiene un costo directo por token procesado (a diferencia de un plan de claude.ai con límite fijo mensual) — antes de automatizar algo a gran escala, vale la pena entender ese costo.',
+      exercise:'Piensa en una tarea familiar que hoy se hace "a mano" con Claude (pedirle algo cada vez) y que, en teoría, podría automatizarse con una API key. No hace falta construirla — solo identifícala.'
+    }
+  ]
+},
+{
+  id:'m5', title:'Módulo 5 — Desarrollar con Claude Code', color:'m5',
+  chapters:[
+    {
+      icon:'⬇️', title:'Instalar Claude Code',
+      group:'El flujo de trabajo',
+      tech:'Claude Code es una herramienta de línea de comandos (y también integrada en la app de escritorio) que permite delegarle tareas de programación a Claude directamente sobre los archivos de un proyecto real. Requiere tener Node.js instalado en el computador para funcionar.',
+      simple:'Es la versión de Claude pensada para programar de verdad — en vez de conversar y copiar resultados a mano, Claude lee, escribe y modifica los archivos del proyecto directamente.',
+      explanation:[
+        'Para usar Claude Code hace falta primero instalar Node.js (el motor que permite ejecutar ciertas herramientas de programación en el computador), y luego instalar Claude Code sobre eso — un paso técnico que, una vez hecho, no hay que repetir.',
+        'También existe una versión dentro de la app de escritorio de Claude, que evita usar la terminal directamente para quienes recién empiezan.'
+      ],
+      examples:[
+        'curso.html se construye y se corrige usando Claude Code, no copiando código manualmente desde el chat.',
+        'Instalar Claude Code es un paso único por computador — una vez instalado, cualquier proyecto en ese computador puede usarlo.'
+      ],
+      pitfall:'Instalar herramientas de programación por primera vez puede sentirse intimidante — es normal necesitar ayuda la primera vez. Vale la pena pedirle ayuda a quien ya lo haya instalado antes de intentarlo solo.',
+      exercise:'Sin instalar nada todavía, averigua si tu computador ya tiene Node.js instalado (esto se puede confirmar más adelante, con ayuda, antes de instalar Claude Code).'
+    },
+    {
+      icon:'🖥️', title:'Cómo se ve una sesión de Claude Code',
+      group:'El flujo de trabajo',
+      tech:'A diferencia del chat, una sesión de Claude Code ocurre dentro de una carpeta de proyecto real: Claude puede leer los archivos existentes, proponer cambios específicos, y ejecutar comandos — todo visible como texto en una terminal.',
+      simple:'En vez de "Claude te cuenta qué haría", en Claude Code "Claude realmente lo hace" — abre archivos, los edita, y te muestra exactamente qué cambió, línea por línea.',
+      explanation:[
+        'Esto es mucho más parecido a cómo trabaja un programador real: los cambios se ven como diferencias (qué línea se agregó, qué línea se borró), no como un bloque de texto nuevo para copiar y pegar.',
+        'Cada sesión de Claude Code ocurre "dentro" del repositorio del proyecto (capítulo de Repositorio, ya visto) — Claude tiene acceso directo a los archivos reales.'
+      ],
+      examples:[
+        'Al pedirle a Claude Code que arregle un bug en curso.html, muestra exactamente qué líneas cambió, para revisar antes de aceptar.',
+        'Una sesión de Claude Code puede incluir varios pasos: leer un archivo, proponer un cambio, ejecutar una prueba, ajustar según el resultado.'
+      ],
+      pitfall:'Ver el código cambiar en tiempo real puede sentirse abrumador al principio — no hace falta entender cada línea, pero sí vale la pena leer el resumen que Claude da de qué cambió y por qué.',
+      exercise:'La próxima vez que Claude Code haga un cambio, pídele explícitamente "explícamelo como si nunca hubiera visto código" antes de aprobarlo.'
+    },
+    {
+      icon:'🔄', title:'El ciclo de trabajo: pedir, revisar, aprobar',
+      group:'El flujo de trabajo',
+      tech:'El flujo típico con Claude Code sigue un ciclo: se describe la tarea → Claude explora los archivos relevantes → propone cambios concretos → la persona revisa → se aprueba, ajusta o rechaza antes de que quede aplicado de forma definitiva.',
+      simple:'Claude no cambia nada "a tus espaldas" — propone, tú revisas, y solo entonces queda hecho. Es un ciclo de ida y vuelta, no una caja negra.',
+      explanation:[
+        'Este ciclo es lo que hace seguro delegar cambios reales a un proyecto: siempre hay un punto de revisión antes de que algo definitivo ocurra, sobre todo antes de un commit o un deploy. Es la misma lógica de "Si algo sale mal" (Módulo 1), pero aplicada a cambios de código en vez de a una respuesta de chat.',
+        'Mientras más específica sea la tarea que se pide (capítulo de Prompting, ya visto), menos idas y vueltas hacen falta en este ciclo.'
+      ],
+      examples:[
+        'Pedir "arregla el bug de las subidas de PDF" inicia el ciclo: Claude busca el archivo relevante, identifica el problema, propone el arreglo, y espera revisión antes de aplicarlo.',
+        'Si el cambio propuesto no es exactamente lo esperado, se puede pedir un ajuste específico antes de aprobar.'
+      ],
+      pitfall:'Aprobar cambios sin leerlos "porque total Claude sabe más" elimina justamente la parte más importante del ciclo — la revisión humana es la que decide si algo realmente sirve para el proyecto.',
+      exercise:'La próxima vez que uses Claude Code, antes de aprobar un cambio, identifica al menos una cosa concreta que revisaste antes de decir que sí.'
+    },
+    {
+      icon:'🧪', title:'Probar que algo funciona (testing básico)',
+      group:'El flujo de trabajo',
+      tech:'"Testing" es el proceso de verificar, de forma deliberada, que un cambio hace lo que se supone que debe hacer, antes de darlo por terminado — puede ser tan simple como abrir la página y probarla a mano.',
+      simple:'Es la diferencia entre "creo que funciona" y "lo probé y funciona" — no asumir que algo está bien solo porque Claude dice que ya está listo.',
+      explanation:[
+        'Para un proyecto como Curso Familiar, testing básico puede ser tan simple como: después de un cambio, abrir el sitio real y probar exactamente la función que se modificó.',
+        'Claude puede ayudar activamente en este paso — pedirle "prueba tú mismo este cambio antes de que lo revise" es una forma válida de usarlo.'
+      ],
+      examples:[
+        'Después de arreglar el bug de subida de PDFs, probar subiendo un PDF real antes de confirmar que el arreglo funcionó.',
+        'Pedirle a Claude Code "antes de terminar, prueba que esto funciona con un archivo de ejemplo" como parte del mismo pedido.'
+      ],
+      pitfall:'Un cambio puede "verse" perfecto en el código y aun así no funcionar en la práctica — la única forma de estar seguro es probarlo de verdad, no solo leerlo.',
+      exercise:'La próxima vez que se corrija algo en el proyecto, define de antemano cómo lo vas a probar, antes de pedir el cambio.'
+    },
+    {
+      icon:'🐛', title:'Cuando algo falla: debugging con ayuda de Claude',
+      group:'El flujo de trabajo',
+      tech:'"Debugging" es el proceso de encontrar y corregir la causa de un error — típicamente empieza por leer el mensaje de error, entender en qué parte del código ocurrió, y descartar posibles causas hasta encontrar la real.',
+      simple:'Es "investigar por qué algo no funcionó", en vez de simplemente intentar de nuevo esperando que esta vez sí resulte.',
+      explanation:[
+        'Claude es especialmente útil para esto: pegar el mensaje de error completo (o dejar que Claude Code lo vea directamente) suele ser más efectivo que describir el problema de memoria.',
+        'Esto conecta con Alucinaciones (ya visto): frente a un error real, es mejor mostrarle a Claude el error exacto que confiar en que "adivine" la causa sin esa información.'
+      ],
+      examples:[
+        'En vez de decir "algo se rompió al subir archivos", es mucho más útil copiar el mensaje de error exacto que aparece en pantalla.',
+        'Claude Code puede investigar un error por su cuenta: revisar los archivos relacionados, probar hipótesis, y confirmar la causa real antes de proponer un arreglo.'
+      ],
+      pitfall:'Intentar arreglar un error "a ciegas" (probando cambios al azar) sin entender la causa real tiende a generar más problemas de los que resuelve.',
+      exercise:'La próxima vez que algo falle en el proyecto, guarda el mensaje de error completo antes de pedirle ayuda a Claude — es la pista más valiosa que existe.'
+    },
+    {
+      icon:'🧭', title:'Local vs. producción',
+      group:'El flujo de trabajo',
+      tech:'"Local" se refiere a probar un cambio en el propio computador, antes de que sea visible para nadie más. "Producción" es la versión real, desplegada y accesible para todos los usuarios.',
+      simple:'Local es "el ensayo, solo para ti"; producción es "la función real, con público". Un cambio debería probarse en local antes de llegar a producción, siempre que sea posible.',
+      explanation:[
+        'Esto conecta con Deploy y Rama/main (ya vistos): trabajar en una rama aparte y probar localmente antes de hacer merge a main y desplegar reduce el riesgo de que un error llegue directo a la versión que usa toda la familia.',
+        'Para un proyecto tan simple como un solo archivo HTML, "local" puede ser tan simple como abrir el archivo directamente en el navegador del computador.'
+      ],
+      examples:[
+        'Antes de subir un cambio grande, probarlo abriendo el archivo directamente en el computador (local) para confirmar que se ve y funciona bien.',
+        'Un error que solo aparece "en producción" y no en local suele deberse a una diferencia de configuración (como una variable de entorno faltante, ya visto).'
+      ],
+      pitfall:'Saltarse la prueba local "porque el cambio es chico" es precisamente cómo pequeños errores llegan a la versión que usa toda la familia sin que nadie los detecte antes.',
+      exercise:'La próxima vez que se haga un cambio a Curso Familiar, pregunta explícitamente si se probó en local antes de que llegara a producción.'
+    },
+    {
+      icon:'🔀', title:'Pull Request',
+      group:'Trabajando en equipo',
+      tech:'Un Pull Request (PR) es una solicitud formal para juntar los cambios de una rama con otra (típicamente con main) — permite revisar exactamente qué cambió, discutirlo, y aprobarlo antes de que se integre a la versión oficial.',
+      simple:'Es como pedir permiso, con todos los detalles a la vista, antes de que un cambio se junte con la versión que todos usan — en vez de simplemente hacerlo y avisar después.',
+      explanation:[
+        'Conecta directo con Rama y main (ya visto): un PR es, literalmente, el paso formal de "juntar" una rama con main, con una revisión en el medio.',
+        'Para un proyecto chico y de una sola persona, no siempre se usa un PR para cada cambio — pero si más de un familiar propone cambios al mismo repositorio, se vuelve una forma clara de coordinarse sin pisarse.'
+      ],
+      examples:[
+        'Un Pull Request muestra exactamente qué archivos cambiaron y qué líneas específicas, para que quien revisa vea el cambio completo antes de aprobarlo.',
+        'Si dos familiares propusieran cambios distintos al mismo proyecto, cada uno podría abrir su propio Pull Request, y revisarlos por separado.'
+      ],
+      pitfall:'Un Pull Request que queda "abierto" sin revisarse por mucho tiempo tiende a desactualizarse respecto a los cambios que sigan ocurriendo en main — mientras antes se revisa, menos conflictos hay que resolver después.',
+      exercise:'Entra al repositorio del curso en GitHub y revisa si existen Pull Requests (abiertos o cerrados) — si no hay ninguno, es porque hasta ahora los cambios se han hecho directo a main.'
+    },
+    {
+      icon:'⚡', title:'Conflicto de merge',
+      group:'Trabajando en equipo',
+      tech:'Un conflicto de merge ocurre cuando dos cambios distintos modifican la misma parte de un archivo de formas incompatibles, y Git no puede decidir automáticamente cuál de los dos debería quedar — requiere que una persona decida manualmente.',
+      simple:'Es cuando dos personas cambiaron la misma frase de la misma página al mismo tiempo, y el sistema no sabe cuál versión dejar — hay que decidirlo a mano.',
+      explanation:[
+        'Esto es más probable mientras más personas trabajen directo sobre los mismos archivos al mismo tiempo — usar ramas (ya visto) para cambios grandes reduce, aunque no elimina, la probabilidad de que esto pase.',
+        'Resolver un conflicto de merge no es necesariamente difícil, pero sí requiere entender qué cambió cada versión — Claude puede ayudar a explicar ambas versiones en lenguaje simple antes de decidir cuál mantener.'
+      ],
+      examples:[
+        'Si dos familiares editan el mismo párrafo de curso.html al mismo tiempo, desde ramas distintas, es probable que aparezca un conflicto de merge al juntar ambos cambios.',
+        'Pedirle a Claude "explícame qué cambia cada una de estas dos versiones en conflicto, en simples palabras" es una forma útil de resolverlo con ayuda.'
+      ],
+      pitfall:'Un conflicto de merge no resuelto correctamente puede hacer que se pierda el trabajo de una de las dos personas sin que nadie lo note de inmediato — vale la pena revisar con calma.',
+      exercise:'Sin necesidad de que ocurra un conflicto real, explica con tus palabras por qué trabajar todos directo en main, al mismo tiempo, aumenta la probabilidad de que esto pase.'
+    }
+  ]
+},
+{
+  id:'m3', title:'Módulo 6 — De la idea al proyecto propio', color:'m3',
+  chapters:[]
+}
+];
+
+// Placeholder titles for chapters not yet developed
+const UPCOMING = {
+  m3: ['Cómo se estructura un buen prompt (a fondo)', 'Cómo pedirle a Claude que construya algo, paso a paso', 'Cómo iterar: feedback, corrección, mejora', 'Taller práctico: tu primer proyecto']
+};
+
+let flatChapters = [];
+let counter = 1;
+COURSE.forEach(mod=>{
+  mod.chapters.forEach(ch=>{
+    flatChapters.push({modId:mod.id, chapter:ch, num:counter});
+    counter++;
+  });
+  (UPCOMING[mod.id]||[]).forEach(title=>{
+    flatChapters.push({modId:mod.id, chapter:{title, upcoming:true}, num:counter});
+    counter++;
+  });
+});
+
+let activeIndex = 0;
+let completed = {};
+
+try{
+  const saved = localStorageFallback();
+}catch(e){}
+
+function localStorageFallback(){ /* no-op, storage not used to keep this preview self-contained */ }
+
+function renderSidebar(){
+  const sidebar = document.getElementById('sidebar');
+  let html = '';
+  let idx = 0;
+  COURSE.forEach(mod=>{
+    const c = MODULE_COLORS[mod.color];
+    html += `<div class="module-block">
+      <div class="module-title" style="background:var(${c.soft});color:var(${c.var})">
+        <span class="dot" style="background:var(${c.var})"></span>${mod.title}
+      </div>`;
+    let lastGroup = null;
+    mod.chapters.forEach(ch=>{
+      const i = idx;
+      if(ch.group && ch.group !== lastGroup){
+        html += `<div class="subgroup-title">${ch.group}</div>`;
+        lastGroup = ch.group;
+      }
+      const isDone = completed[i];
+      html += `<button class="chapter-btn ${i===activeIndex?'active':''} ${isDone?'done':''}" onclick="goTo(${i})">
+        <span class="check"></span>
+        <span class="num">${i+1}</span>
+        <span>${ch.icon} ${ch.title}</span>
+      </button>`;
+      idx++;
+    });
+    (UPCOMING[mod.id]||[]).forEach(title=>{
+      const i = idx;
+      html += `<button class="chapter-btn ${i===activeIndex?'active':''}" disabled>
+        <span class="check"></span>
+        <span class="num">${i+1}</span>
+        <span>🔒 ${title}</span>
+      </button>`;
+      idx++;
+    });
+    html += `</div>`;
+  });
+  sidebar.innerHTML = html;
+}
+
+function renderContent(){
+  const content = document.getElementById('content');
+  const entry = flatChapters[activeIndex];
+  const ch = entry.chapter;
+  const c = MODULE_COLORS[entry.modId];
+  const modTitle = COURSE.find(m=>m.id===entry.modId).title;
+
+  if(ch.upcoming){
+    content.innerHTML = `
+      <div class="chapter-header">
+        <span class="chapter-eyebrow" style="background:var(${c.soft});color:var(${c.var})">${modTitle}</span>
+        <h2>🔒 ${ch.title}</h2>
+      </div>
+      <div class="placeholder">Este capítulo todavía no está desarrollado. Se arma en la próxima pasada del curso.</div>
+      <div class="chapter-nav">
+        <button class="nav-btn" onclick="goTo(${activeIndex-1})" ${activeIndex===0?'disabled':''}>← Anterior</button>
+        <button class="nav-btn" onclick="goTo(${activeIndex+1})" ${activeIndex===flatChapters.length-1?'disabled':''}>Siguiente →</button>
+      </div>`;
+    return;
+  }
+
+  const examplesHtml = ch.examples.map(e=>`<div class="example-box">${e}</div>`).join('');
+  const explanationHtml = ch.explanation.map(p=>`<p>${p}</p>`).join('');
+  const isDone = completed[activeIndex];
+  const eyebrowText = ch.group ? `${modTitle} · ${ch.group}` : modTitle;
+
+  content.innerHTML = `
+    <div class="chapter-header">
+      <span class="chapter-eyebrow" style="background:var(${c.soft});color:var(${c.var})">${eyebrowText}</span>
+      <h2>${ch.icon} ${ch.title}</h2>
+    </div>
+
+    <section class="block">
+      <div class="block-label">🔬 Definición técnica</div>
+      <div class="card-def"><p style="margin:0">${ch.tech}</p></div>
+    </section>
+
+    <section class="block">
+      <div class="block-label">💡 En simples palabras</div>
+      <p>${ch.simple}</p>
+    </section>
+
+    <section class="block">
+      <div class="block-label">📖 Explicación</div>
+      ${explanationHtml}
+    </section>
+
+    <section class="block">
+      <div class="block-label">✅ Ejemplos</div>
+      ${examplesHtml}
+    </section>
+
+    <section class="block">
+      <div class="block-label">⚠️ Ojo con esto</div>
+      <div class="pitfall-box">${ch.pitfall}</div>
+    </section>
+
+    <section class="block">
+      <div class="block-label">🎯 Tu turno</div>
+      <div class="exercise-box">
+        <p>${ch.exercise}</p>
+        <button class="complete-btn ${isDone?'done':''}" onclick="toggleComplete(${activeIndex})">
+          ${isDone?'✓ Completado':'Marcar como completado'}
+        </button>
+      </div>
+    </section>
+
+    <div class="chapter-nav">
+      <button class="nav-btn" onclick="goTo(${activeIndex-1})" ${activeIndex===0?'disabled':''}>← Anterior</button>
+      <button class="nav-btn" onclick="goTo(${activeIndex+1})" ${activeIndex===flatChapters.length-1?'disabled':''}>Siguiente →</button>
+    </div>
+  `;
+}
+
+function renderProgress(){
+  const developed = flatChapters.filter(f=>!f.chapter.upcoming).length;
+  const doneCount = Object.keys(completed).filter(k=>completed[k]).length;
+  const pct = developed>0 ? Math.round((doneCount/developed)*100) : 0;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = doneCount+' / '+developed+' capítulos';
+}
+
+function goTo(i){
+  if(i<0 || i>=flatChapters.length) return;
+  if(flatChapters[i].chapter.upcoming){ activeIndex=i; renderSidebar(); renderContent(); return; }
+  activeIndex = i;
+  renderSidebar();
+  renderContent();
+  document.getElementById('content').scrollTop = 0;
+}
+
+function toggleComplete(i){
+  completed[i] = !completed[i];
+  renderSidebar();
+  renderContent();
+  renderProgress();
+}
+
+renderSidebar();
+renderContent();
+renderProgress();
+
+// ---------- Modo Clase (presentación, una idea a la vez) ----------
+let presoMode = false;
+let presoIndex = 0;
+let SLIDE_DECK = null;
+
+function buildSlideDeck(){
+  const deck = [];
+  flatChapters.forEach((entry)=>{
+    const ch = entry.chapter;
+    if(ch.upcoming) return;
+    const c = MODULE_COLORS[entry.modId];
+    const modTitle = COURSE.find(m=>m.id===entry.modId).title;
+    const base = {chapIdx:entry.num-1, modId:entry.modId, modTitle:modTitle, c:c, chTitle:ch.title, chIcon:ch.icon, chGroup:ch.group};
+    deck.push(Object.assign({}, base, {type:'chapterTitle'}));
+    deck.push(Object.assign({}, base, {type:'tech', label:'🔬 Definición técnica', text:ch.tech}));
+    deck.push(Object.assign({}, base, {type:'simple', label:'💡 En simples palabras', text:ch.simple}));
+    ch.explanation.forEach(p=> deck.push(Object.assign({}, base, {type:'explanation', label:'📖 Explicación', text:p})));
+    ch.examples.forEach(p=> deck.push(Object.assign({}, base, {type:'example', label:'✅ Ejemplo', text:p})));
+    deck.push(Object.assign({}, base, {type:'pitfall', label:'⚠️ Ojo con esto', text:ch.pitfall}));
+    deck.push(Object.assign({}, base, {type:'exercise', label:'🎯 Tu turno', text:ch.exercise}));
+  });
+  return deck;
+}
+
+function togglePreso(){
+  presoMode = !presoMode;
+  const layoutEl = document.querySelector('.layout');
+  const presoEl = document.getElementById('presoView');
+  if(presoMode){
+    if(!SLIDE_DECK) SLIDE_DECK = buildSlideDeck();
+    const target = SLIDE_DECK.findIndex(s=>s.chapIdx===activeIndex);
+    presoIndex = target>=0 ? target : 0;
+    layoutEl.style.display = 'none';
+    presoEl.classList.add('active');
+    renderPreso();
+  } else {
+    layoutEl.style.display = 'flex';
+    presoEl.classList.remove('active');
+    renderSidebar();
+    renderContent();
+  }
+}
+
+function renderPreso(){
+  const view = document.getElementById('presoView');
+  const slide = SLIDE_DECK[presoIndex];
+  const isDone = !!completed[slide.chapIdx];
+  let bodyHtml = '';
+  if(slide.type === 'chapterTitle'){
+    bodyHtml = `<div class="preso-slide-inner" style="text-align:center">
+      <span class="preso-title-icon">${slide.chIcon}</span>
+      <div class="preso-title-text">${slide.chTitle}</div>
+    </div>`;
+  } else if(slide.type === 'exercise'){
+    bodyHtml = `<div class="preso-slide-inner">
+      <div class="preso-label" style="background:var(${slide.c.soft});color:var(${slide.c.var})">${slide.label}</div>
+      <div class="preso-body card">${slide.text}</div>
+      <button class="complete-btn preso-complete-btn ${isDone?'done':''}" onclick="toggleComplete(${slide.chapIdx});renderPreso();">${isDone?'✓ Completado':'Marcar como completado'}</button>
+    </div>`;
+  } else {
+    const cardClass = slide.type === 'tech' ? ' card' : '';
+    bodyHtml = `<div class="preso-slide-inner">
+      <div class="preso-label" style="background:var(${slide.c.soft});color:var(${slide.c.var})">${slide.label}</div>
+      <div class="preso-body${cardClass}">${slide.text}</div>
+    </div>`;
+  }
+  const groupTxt = slide.chGroup ? (' · ' + slide.chGroup) : '';
+  view.innerHTML = `
+    <div class="preso-topbar">
+      <div class="preso-info">${slide.modTitle}${groupTxt} — ${slide.chTitle}</div>
+      <button class="preso-exit-btn" onclick="togglePreso()">Salir ✕</button>
+    </div>
+    <div class="preso-slide">${bodyHtml}</div>
+    <div class="preso-nav">
+      <button class="preso-arrow-btn" onclick="presoPrev()" ${presoIndex===0?'disabled':''}>←</button>
+      <div class="preso-dots">${presoIndex+1} / ${SLIDE_DECK.length}</div>
+      <button class="preso-arrow-btn" onclick="presoNext()" ${presoIndex===SLIDE_DECK.length-1?'disabled':''}>→</button>
+    </div>
+  `;
+}
+
+function presoNext(){
+  if(presoIndex < SLIDE_DECK.length-1){
+    presoIndex++;
+    activeIndex = SLIDE_DECK[presoIndex].chapIdx;
+    renderPreso();
+    renderProgress();
+  }
+}
+function presoPrev(){
+  if(presoIndex > 0){
+    presoIndex--;
+    activeIndex = SLIDE_DECK[presoIndex].chapIdx;
+    renderPreso();
+    renderProgress();
+  }
+}
+
+document.addEventListener('keydown', function(e){
+  if(!presoMode) return;
+  if(e.key === 'ArrowRight') presoNext();
+  else if(e.key === 'ArrowLeft') presoPrev();
+  else if(e.key === 'Escape') togglePreso();
+});
+</script>
+</body>
+</html>
